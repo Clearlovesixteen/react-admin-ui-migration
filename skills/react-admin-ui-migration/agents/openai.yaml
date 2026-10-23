@@ -1,0 +1,4 @@
+interface:
+  display_name: "React 后台 UI 迁移"
+  short_description: "迁移旧后台到新版组件体系，按目标项目保留业务权限和接口行为"
+  default_prompt: "使用 $react-admin-ui-migration，将当前旧后台迁移到新版 UI，保留业务行为。"

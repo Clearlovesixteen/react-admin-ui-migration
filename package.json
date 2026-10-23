@@ -1,0 +1,28 @@
+{
+  "name": "@gancao-web/react-admin-ui-migration",
+  "version": "0.1.0",
+  "description": "React 后台新版 UI 迁移 Skill，包含项目级 PageLayout 模板、组件迁移规则和只读扫描工具",
+  "type": "module",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Clearlovesixteen/react-admin-ui-migration.git"
+  },
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "files": [
+    "plugin.json",
+    "skills/",
+    "README.md"
+  ],
+  "scripts": {
+    "lint": "node scripts/validate.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "prepack": "npm run lint && npm test",
+    "version:patch": "node scripts/version.mjs patch",
+    "version:minor": "node scripts/version.mjs minor",
+    "version:major": "node scripts/version.mjs major"
+  }
+}

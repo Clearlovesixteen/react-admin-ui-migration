@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "componentPackage": "@gancao-web/base-element-react",
+  "componentVersion": "3.0.0",
+  "uiDependencies": {
+    "react": "18.2.0",
+    "antd": "^4.24.1",
+    "@ant-design/icons": "^5.0.1"
+  },
+  "extraction": "只包含项目展示层；排除业务入口、RouteTabs、用户/权限 Store、平台 API、品牌资源和固定平台组件。",
+  "sources": [
+    {
+      "path": "src/components/PageLayout/config.ts",
+      "sha256": "3db5542b60d98e2c7dff1df64ef3cd85ec4f6cbe327f15771e24e33629961704"
+    },
+    {
+      "path": "src/components/PageLayout/types.ts",
+      "sha256": "30bf57d34eb4e869e1d2da75e2509a988a3f2bdd79b13124ad2e259ffe1223a4"
+    },
+    {
+      "path": "src/components/PageLayout/components/PageLayoutShell.tsx",
+      "sha256": "dc390b9847d1f5d37e9a9308f811c69758684e53e882ad9a357eaeb33e545017"
+    },
+    {
+      "path": "src/components/PageLayout/components/Menu.tsx",
+      "sha256": "d993bd1f8ea4de31d1696dc4874c6a86c75c5610d21e2ca7812cc7d3632fa17f"
+    },
+    {
+      "path": "src/components/PageLayout/components/MenuSearch.tsx",
+      "sha256": "8f0775b1331e61bb2480c22d2b2b8f22cfbd24a14b7fb8e8154b58a9d1fa2626"
+    },
+    {
+      "path": "src/components/PageLayout/utils/menu.ts",
+      "sha256": "5376194f4ea922bb0209da122225ffd676b096b27982c8a84f246a2096f53e2b"
+    },
+    {
+      "path": "src/components/PageLayout/utils/storage.ts",
+      "sha256": "65c13608863dfbbfae097509d27b1c9593fbd108300e5e614c3b49f768d96a58"
+    },
+    {
+      "path": "src/components/PageLayout/index.less",
+      "sha256": "d7aeec280d4949bc332ecadf854e641049e7cae59d54a518d570f8aa3bbb4494"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "assets/page-layout/config.ts",
+      "sha256": "3db5542b60d98e2c7dff1df64ef3cd85ec4f6cbe327f15771e24e33629961704"
+    },
+    {
+      "path": "assets/page-layout/types.ts",
+      "sha256": "3a4dc4f70852f66c67d11e73ffb592afca8cd772d6718ff71f9a08be5612dd10"
+    },
+    {
+      "path": "assets/page-layout/components/PageLayoutShell.tsx",
+      "sha256": "8944f7b5b09ea9dcd43d26fedf54ac2dd466461b20004978c113a5c72f6901e3"
+    },
+    {
+      "path": "assets/page-layout/components/Menu.tsx",
+      "sha256": "d993bd1f8ea4de31d1696dc4874c6a86c75c5610d21e2ca7812cc7d3632fa17f"
+    },
+    {
+      "path": "assets/page-layout/components/MenuSearch.tsx",
+      "sha256": "8f0775b1331e61bb2480c22d2b2b8f22cfbd24a14b7fb8e8154b58a9d1fa2626"
+    },
+    {
+      "path": "assets/page-layout/utils/menu.ts",
+      "sha256": "5376194f4ea922bb0209da122225ffd676b096b27982c8a84f246a2096f53e2b"
+    },
+    {
+      "path": "assets/page-layout/utils/storage.ts",
+      "sha256": "65c13608863dfbbfae097509d27b1c9593fbd108300e5e614c3b49f768d96a58"
+    },
+    {
+      "path": "assets/page-layout/index.less",
+      "sha256": "facfeee339479daccad860de497d616cd21040cdd29c2febccbfd1d0ce821c51"
+    }
+  ]
+}

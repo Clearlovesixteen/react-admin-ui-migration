@@ -1,0 +1,20 @@
+{
+  "name": "gancao-ui-migration",
+  "interface": {
+    "displayName": "甘草后台 UI 迁移"
+  },
+  "plugins": [
+    {
+      "name": "react-admin-ui-migration",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

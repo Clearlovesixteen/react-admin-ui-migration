@@ -1,0 +1,690 @@
+@import 'antd/es/style/themes/default.less';
+
+@page-layout-header-height: 59px;
+@page-layout-sidebar-width: 200px;
+@page-layout-sidebar-collapsed-width: 80px;
+@page-layout-collapse-height: 46px;
+
+@keyframes page-layout-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  color: @text-color;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% auto;
+
+  .page-layout-header {
+    display: flex;
+    flex: 0 0 @page-layout-header-height;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    height: @page-layout-header-height;
+    padding: 0 22px;
+  }
+
+  .page-layout-header-left,
+  .page-layout-header-right,
+  .page-layout-brand,
+  .page-layout-account {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .page-layout-header-left {
+    flex: 1;
+    gap: 20px;
+    overflow: hidden;
+  }
+
+  .page-layout-header-right {
+    flex: none;
+  }
+
+  .page-layout-brand {
+    flex: none;
+    gap: 8px;
+  }
+
+  .page-layout-brand-logo {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 32px;
+    overflow: hidden;
+  }
+
+  .page-layout-brand-image {
+    display: block;
+    width: 20px;
+    max-width: 100%;
+    height: auto;
+    max-height: 32px;
+  }
+
+  .page-layout-brand-title {
+    max-width: 320px;
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 28px;
+    color: @heading-color;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-layout-header-action {
+    display: flex;
+    flex: none;
+    align-items: center;
+  }
+
+  .page-layout-header-divider {
+    display: block;
+    flex: none;
+    width: 1px;
+    height: 16px;
+    margin: 0 16px;
+    background-color: @border-color-split;
+  }
+
+  .page-layout-account {
+    flex: none;
+    gap: 4px;
+    max-width: 240px;
+    padding: 0;
+    font: inherit;
+    line-height: 1.2;
+    color: @text-color;
+    background: transparent;
+    border: 0;
+  }
+
+  .page-layout-account-button {
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      color: @primary-color;
+    }
+
+    &:focus-visible {
+      outline: 2px solid fade(@primary-color, 35%);
+      outline-offset: 3px;
+    }
+  }
+
+  .page-layout-account-icon,
+  .page-layout-account-suffix {
+    flex: none;
+  }
+
+  .page-layout-account-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-layout-main {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .page-layout-sidebar {
+    display: flex;
+    flex: 0 0 @page-layout-sidebar-width;
+    flex-direction: column;
+    width: @page-layout-sidebar-width;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent;
+    transition:
+      width 0.2s ease,
+      flex-basis 0.2s ease;
+  }
+
+  &.is-collapsed .page-layout-sidebar {
+    flex-basis: @page-layout-sidebar-collapsed-width;
+    width: @page-layout-sidebar-collapsed-width;
+  }
+
+  .page-layout-menu {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: transparent;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      background: transparent;
+    }
+
+    .page-layout-menu-level {
+      min-width: 0;
+    }
+
+    .page-layout-menu-item {
+      position: relative;
+      min-width: 0;
+    }
+
+    .page-layout-menu-level-1 > .page-layout-menu-item {
+      margin: 0 8px 0 12px;
+    }
+
+    .page-layout-menu-button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+      height: 32px;
+      padding: 0 10px;
+      overflow: hidden;
+      font: inherit;
+      font-size: 14px;
+      line-height: 18px;
+      color: @text-color-secondary;
+      text-align: left;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+
+      &:hover {
+        background-color: fade(@text-color, 5%);
+      }
+
+      &:focus-visible {
+        outline: 2px solid fade(@primary-color, 35%);
+        outline-offset: -2px;
+      }
+
+      &:disabled {
+        color: @disabled-color;
+        cursor: not-allowed;
+        background: transparent;
+      }
+
+      &.is-selected {
+        font-weight: 600;
+        color: @primary-color;
+        background-color: fade(@primary-color, 10%);
+        border-radius: 8px;
+      }
+
+      &.has-selected-child:not(.is-selected) {
+        font-weight: 600;
+        color: @text-color;
+      }
+
+      &.is-open .page-layout-menu-expand-icon {
+        transform: rotate(180deg);
+      }
+    }
+
+    .page-layout-menu-level-1 > .page-layout-menu-item > .page-layout-menu-button {
+      height: 40px;
+      margin-top: 6px;
+    }
+
+    .page-layout-menu-level:not(.page-layout-menu-level-1) {
+      padding-left: 6px;
+
+      .page-layout-menu-item {
+        padding: 4px 0 4px 12px;
+      }
+    }
+
+    .page-layout-menu-button-main {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .page-layout-menu-button-main > .anticon,
+    .page-layout-menu-icon,
+    .page-layout-menu-dot {
+      flex: none;
+    }
+
+    .page-layout-menu-button-main > .anticon,
+    .page-layout-menu-icon {
+      width: 18px;
+      font-size: 16px;
+    }
+
+    .page-layout-menu-dot {
+      width: 4px;
+      height: 4px;
+      margin: 0 7px;
+      background-color: @text-color-secondary;
+      border-radius: 50%;
+    }
+
+    .page-layout-menu-label {
+      flex: 1;
+      min-width: 0;
+      margin-left: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-layout-menu-button-main > .page-layout-menu-label:first-child {
+      margin-left: 0;
+    }
+
+    .page-layout-menu-expand-icon {
+      flex: none;
+      margin-left: 8px;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    &.is-collapsed {
+      .page-layout-menu-level-1 > .page-layout-menu-item {
+        margin-right: 20px;
+        margin-left: 20px;
+      }
+
+      .page-layout-menu-level-1 > .page-layout-menu-item > .page-layout-menu-button {
+        justify-content: center;
+        padding: 0;
+      }
+
+      .page-layout-menu-level-1
+        > .page-layout-menu-item.is-selected-branch
+        > .page-layout-menu-button {
+        color: @primary-color;
+        background-color: fade(@primary-color, 10%);
+      }
+
+      .page-layout-menu-level-1 .page-layout-menu-label,
+      .page-layout-menu-level-1 .page-layout-menu-expand-icon {
+        flex: none;
+        width: 0;
+        margin-left: 0;
+        overflow: hidden;
+        opacity: 0;
+      }
+    }
+  }
+
+  .page-layout-collapse {
+    display: flex;
+    flex: 0 0 @page-layout-collapse-height;
+    align-items: center;
+    height: @page-layout-collapse-height;
+    padding-left: 20px;
+  }
+
+  &.is-collapsed .page-layout-collapse {
+    justify-content: center;
+    padding-left: 0;
+  }
+
+  .page-layout-collapse-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font: inherit;
+    color: @text-color-secondary;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+
+    &:hover,
+    &:focus-visible {
+      color: @primary-color;
+      background-color: fade(@text-color, 5%);
+    }
+
+    &:focus-visible {
+      outline: 2px solid fade(@primary-color, 35%);
+      outline-offset: -2px;
+    }
+  }
+
+  .page-layout-content {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 8px 16px 0;
+    overflow: hidden;
+    background-color: @component-background;
+    border-radius: 8px;
+  }
+
+  .page-layout-tabs {
+    flex: none;
+    min-width: 0;
+    margin-top: -1px;
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+    }
+  }
+
+  .page-layout-content-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 20px;
+
+    &.is-scroll-container {
+      overflow: auto;
+    }
+
+    &.is-scroll-child {
+      overflow: hidden;
+
+      .ka-wrapper,
+      .ka-content {
+        min-width: 0;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .ka-wrapper {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ka-scroll {
+        min-width: 0;
+        height: 100%;
+        min-height: 0;
+        overflow: auto;
+      }
+    }
+
+    &.has-transition {
+      animation: page-layout-content-enter 0.8s ease-out;
+    }
+  }
+
+  .page-layout-menu-search {
+    position: relative;
+    display: flex;
+    flex: 0 1 200px;
+    align-items: center;
+    width: 200px;
+    min-width: 120px;
+    max-width: 200px;
+    height: 32px;
+    overflow: hidden;
+    background: fade(@text-color, 4%);
+    border-radius: 6px;
+  }
+
+  .page-layout-menu-search-icon {
+    position: absolute;
+    left: 8px;
+    z-index: 1;
+    font-size: 14px;
+    color: @text-color-secondary;
+    pointer-events: none;
+  }
+
+  .page-layout-menu-search-select {
+    width: 100%;
+
+    .ant-select-selector {
+      height: 32px !important;
+      padding-left: 28px !important;
+      background-color: transparent !important;
+    }
+
+    .ant-select-selection-search {
+      left: 28px !important;
+    }
+
+    .ant-select-selection-search-input {
+      height: 32px !important;
+    }
+
+    .ant-select-selection-placeholder {
+      line-height: 32px;
+      color: @text-color-secondary;
+    }
+  }
+}
+
+.page-layout-menu-popup {
+  .ant-popover-inner-content {
+    padding: 8px 0;
+  }
+
+  .page-layout-menu-level {
+    min-width: 160px;
+  }
+
+  .page-layout-menu-item {
+    margin: 4px 8px;
+  }
+
+  .page-layout-menu-level:not(.page-layout-menu-level-1) {
+    padding-left: 8px;
+  }
+
+  .page-layout-menu-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    height: 32px;
+    padding: 0 12px;
+    overflow: hidden;
+    font: inherit;
+    font-size: 14px;
+    color: @text-color-secondary;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+
+    &:hover,
+    &:focus-visible {
+      background-color: fade(@text-color, 5%);
+    }
+
+    &:focus-visible {
+      outline: 2px solid fade(@primary-color, 35%);
+      outline-offset: -2px;
+    }
+
+    &:disabled {
+      color: @disabled-color;
+      cursor: not-allowed;
+      background: transparent;
+    }
+
+    &.is-selected {
+      font-weight: 600;
+      color: @primary-color;
+      background-color: fade(@primary-color, 10%);
+      border-radius: 8px;
+    }
+  }
+
+  .page-layout-menu-button-main {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .page-layout-menu-button-main > .anticon,
+  .page-layout-menu-icon {
+    flex: none;
+    width: 18px;
+    font-size: 16px;
+  }
+
+  .page-layout-menu-dot {
+    flex: none;
+    width: 4px;
+    height: 4px;
+    margin: 0 7px;
+    background-color: @text-color-secondary;
+    border-radius: 50%;
+  }
+
+  .page-layout-menu-label {
+    flex: 1;
+    min-width: 0;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-layout-menu-button-main > .page-layout-menu-label:first-child {
+    margin-left: 0;
+  }
+
+  .page-layout-menu-expand-icon {
+    flex: none;
+    margin-left: 8px;
+    font-size: 12px;
+  }
+
+  .page-layout-menu-popup-label {
+    display: block;
+    min-width: 120px;
+    padding: 0 12px;
+    line-height: 32px;
+    color: @text-color;
+  }
+
+  &.page-layout-menu-search-dropdown {
+    .page-layout-menu-search-option {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .page-layout-menu-search-name,
+    .page-layout-menu-search-path {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-layout-menu-search-name {
+      font-weight: 500;
+      color: @text-color;
+    }
+
+    .page-layout-menu-search-path {
+      margin-top: 2px;
+      font-size: 12px;
+      color: @text-color-secondary;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-layout {
+    .page-layout-sidebar,
+    .page-layout-menu-button,
+    .page-layout-menu-expand-icon,
+    .page-layout-content-body.has-transition {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+@media print {
+  .page-layout {
+    display: block;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    background: none !important;
+
+    .page-layout-header,
+    .page-layout-sidebar,
+    .page-layout-tabs {
+      display: none;
+    }
+
+    .page-layout-main,
+    .page-layout-content,
+    .page-layout-content-body {
+      display: block;
+      width: auto;
+      min-width: 0;
+      height: auto;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: visible !important;
+      background: transparent;
+      border-radius: 0;
+      animation: none !important;
+    }
+
+    .page-layout-content-body.is-scroll-child {
+      .ka-wrapper,
+      .ka-content,
+      .ka-scroll {
+        display: block;
+        width: auto;
+        min-width: 0;
+        height: auto;
+        min-height: 0;
+        overflow: visible !important;
+      }
+    }
+  }
+}

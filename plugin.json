@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "react-admin-ui-migration",
+  "version": "0.1.0",
+  "description": "React 后台新版 UI 迁移 Skill，包含项目级 PageLayout 模板、组件迁移规则和只读扫描工具",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "React 后台 UI 迁移",
+        "shortDescription": "迁移到新版组件和项目级 PageLayout，保留业务契约",
+        "longDescription": "为 React/Ant Design 后台提供可离线使用的 UI 迁移流程、PageLayout 展示模板和候选扫描。组件库与应用外壳独立维护，权限、请求和平台功能按目标项目适配。",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ]
+      }
+    }
+  }
+}
