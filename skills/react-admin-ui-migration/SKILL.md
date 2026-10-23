@@ -49,6 +49,8 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 按 [组件迁移](references/components.md) 核对能力。优先读目标项目本地组件源码；否则读已安装包的真实导出、类型和 `skill/SKILL.md`，按需读取其 references。遇到资料与实现不一致，以安装版本的代码/类型为准。
 
+合并后的组件是一套实现，先按组件迁移中的判断步骤核对 defaults、全局初始化、页面覆盖和旧样式，再应用已确认的 UI 基线。全局 list 配置搜索区，纯编辑表单按实例判断。将变更合并进目标原有 BaseElement.use；该调用替换整份注册值，不能另调仅含 UI 字段的 use。
+
 旧包 `base-element-react` 与新包 `@gancao-web/base-element-react` 不视为等价别名。需要升级时使用目标包管理器，保留目标 React/Ant Design 等环境；不要为了迁 UI 一并复制维护仓库的 Vite、TypeScript 或 lint 版本。
 
 随包展示模板适用于 React/Ant Design 4。目标使用 Ant Design 5 或其他框架时，不直接覆盖或强制降级；核实可复用的迁移单元，并说明模板不适用的部分。

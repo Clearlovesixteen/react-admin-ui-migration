@@ -2,18 +2,43 @@
 
 当前可核对基线为 base-element-react 3.0.0。版本数字用于识别基线，不代表后续版本自动兼容。以目标实际安装的导出、类型和实现为准；包未安装时先完成已授权的依赖升级，再验证 API。
 
+## 如何判断合并后的组件
+
+合并后的组件只有一套实现，视觉和布局由配置决定。包名、版本号或组件名称相同，不能证明目标项目已经采用新版 UI。
+
+1. 追踪目标真实 import 与别名解析，确认加载的是本地组件目录还是锁文件对应的已安装包；同名本地旧实现不能当成新包。
+2. 阅读该实现的公开导出、`typing`、`config.ts`、Form/List/Table defaults，以及组件包自带的 skill。目标包有差异时继续核对对应组件实现。
+3. 阅读目标初始化和代表页面，区分内置默认值、项目全局值、页面覆盖和旧 CSS 补丁。记录每项的实际值、源码位置和处理理由，再修改。
+4. 已符合新契约的页面保留；旧 API 先适配；业务专属扩展先迁移使用方。升级包后仍需检查页面配置和样式，不能将安装成功作为 UI 迁移完成。
+
+当前维护项目 `src/main.tsx` 使用的 UI 配置与组件内置值不同：
+
+| 能力 | 组件内置行为 | 当前项目的 UI 基线 |
+| --- | --- | --- |
+| 搜索布局 | flow，不指定统一列数 | grid，四列 |
+| 紧凑组合 / 表单项边框 | inset: false / itemBordered: false | 两者均为 true |
+| 搜索项间距 | 右 40、下 24 | 右 12、下 14，padding: 0，colon: false |
+| 列表满高 | fitViewport: false | true，必须具备可用的父级高度 |
+| 搜索区默认收起 | defaultCollapsed: false | true，仍受展开/收起条件约束 |
+| 工具栏按钮 | 默认右对齐 | 左对齐、default 类型 |
+| 表格操作列 | operationAlign: right | left |
+
+这份表描述维护项目的配置基线，不把目标业务分页协议、默认查询、缓存或按钮权限算作视觉默认值。后续版本发生变化时重新核对实现。
+
 ## 初始化与职责
+
+将 UI 字段合并进目标已有初始化。下面的 existingConfig 表示已经读到的目标对象配置；原来使用配置函数时，在原函数返回对象中合并，保持运行时读取语义。
 
 ~~~tsx
 import BaseElement from '@gancao-web/base-element-react';
+import type { BaseGlobalProps } from '@gancao-web/base-element-react';
 
-BaseElement.use({
-  request: {
-    http: (url, data, config) => targetRequest(url, data, config),
-    upload: targetUpload,
-  },
-  file: { host: targetFileHost },
+const migratedConfig: BaseGlobalProps = {
+  ...existingConfig,
   list: {
+    ...existingConfig.list,
+    fitViewport: true,
+    defaultCollapsed: true,
     layoutMode: 'grid',
     itemCol: 4,
     inset: true,
@@ -22,20 +47,39 @@ BaseElement.use({
     itemRight: 12,
     itemBottom: 14,
     padding: 0,
+    btnsConfig: {
+      ...existingConfig.list?.btnsConfig,
+      align: 'left',
+      type: 'default',
+    },
   },
-  table: { operationAlign: 'left' },
-});
+  table: { ...existingConfig.table, operationAlign: 'left' },
+};
+
+BaseElement.use(migratedConfig);
 ~~~
 
-这是 UI 配置示例。targetRequest/targetUpload/targetFileHost 必须接目标已有实现；HTTP 实参转换按目标封装决定，不能假设 requestApi 接收多个位置参数。
+BaseElement.use 每次替换整份全局注册值，不是累积 patch。不要为了加入 UI 配置另调一次只含 list/table 的 use，导致 request、file、upload、modal 等既有配置丢失。组件解析时的默认值合并与这里的全局注册是不同步骤。
 
-保留 pageKey、sizeKey、listKey、totalKey、rowKey 和 onShowRefresh 等原有协议及行为。pageinfo.total 只是某种后端响应路径，不是所有项目的标准。
+request/upload/file 必须保留目标已有实现和实参协议；HTTP 适配不能假设 requestApi 接收多个位置参数。保留 pageKey、sizeKey、listKey、totalKey、rowKey 和 onShowRefresh 等原有协议及行为。pageinfo.total 只是某种后端响应路径，不是所有项目的标准。
 
-BaseElement.use 不包含 layout。不要导入不存在的 PageLayout/NewMenu/RouteTabs，也不把业务 Layout 塞回组件库。
+上述 fitViewport 基线在 Layout 到列表的高度、flex、min-height 和滚动责任确认后使用。自定义滚动、复杂嵌套 Tabs、非满高页面先逐页判断，可在页面配置 fitViewport: false。defaultCollapsed 也不会强制原本没有折叠条件的搜索区收起。
+
+BaseElement.use 不包含 layout。PageLayout 由目标项目维护，不能从组件包导入不存在的 PageLayout/NewMenu/RouteTabs。
+
+## 按页面形态决定配置
+
+| 目标形态 | 迁移判断与配置位置 |
+| --- | --- |
+| 标准列表搜索区 | 采用已确认的全局 list 视觉；检查页面同名字段覆盖，字段用 colSpan 适配跨列 |
+| 纯新增/编辑弹窗 | 不继承全局 list 搜索样式或 fitViewport；按原表单语义在实例配置，不将列表视觉放进全局 form |
+| 混合列表、内容 Tabs、自定义表格 | 单独核对父级高度、激活值、销毁/保活、选择与滚动；仅在等价行为成立时启用相关能力 |
+| 多维组合查询 | 核对 select-input 的 prop/field、默认值、切换与重置，保持最终接口字段 |
+| 已符合合并后 API 的页面 | 保留有效配置；旧 labelWidth、paddingX、scrollHeight 和 CSS 补丁逐项确认后清理 |
 
 ## 配置优先级与表单
 
-配置为“内置值 < 全局值 < 实例值”，undefined 继续继承；false、0 和空字符串是有效覆盖。list.btnsConfig 按字段合并。
+配置总体为“内置值 < 全局值 < 实例值”。列表搜索表单具体为“Form 内置值 < 全局 form < 全局 list 顶层表单字段 < 页面顶层表单字段”；全局 list 只在有真实表格列时参与。undefined 继续继承，false、0 和空字符串是有效覆盖；list.btnsConfig 按字段合并。
 
 - form 影响所有 BaseForm，包括编辑弹窗。只调整搜索区时用 list 顶层字段。
 - list 中的表单默认值只用于含真实 table 列的列表；table 未配置或为空数组的纯表单不继承列表外观和 fitViewport。
@@ -66,7 +110,7 @@ BaseElement.use 不包含 layout。不要导入不存在的 PageLayout/NewMenu/R
 }
 ~~~
 
-defaultRange 来自目标原默认值；value 是按维度索引保存的数组。单独使用 BaseSelectInput 组件时字段配置叫 lib；不要混淆组件 props 和 BaseForm item。
+defaultRange 来自目标原默认值；value 是按维度索引保存的数组。单独使用 BaseSelectInput 组件时，维度选项用 lib；在 BaseForm item 中维度选项用 prop，内部控件仍用 field。不要混淆两层 API。
 
 保留切换维度时的值清理、回车与自动查询、重置、缓存和最终 API 字段。需要转换参数时集中映射，并在请求前去掉仅用于 UI 的临时字段。
 
