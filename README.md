@@ -27,9 +27,10 @@ tests/                            扫描器和分发契约验证
 
 ~~~bash
 codex plugin marketplace add git@github.com:Clearlovesixteen/react-admin-ui-migration.git --ref main
+codex plugin add react-admin-ui-migration@gancao-ui-migration
 ~~~
 
-然后在插件页中选择“甘草后台 UI 迁移”，安装 React 后台 UI 迁移插件。私有仓库需要当前 GitHub 账号拥有读取权限及可用的 Git SSH 登录。
+也可以添加插件源后，在插件页中选择“甘草后台 UI 迁移”并安装。私有仓库需要当前 GitHub 账号拥有读取权限及可用的 Git SSH 登录。
 
 安装包包含全部说明、模板和扫描器，不需要先克隆维护仓库、安装后台依赖或启动 MCP 服务。在目标后台项目的新会话中调用：
 
