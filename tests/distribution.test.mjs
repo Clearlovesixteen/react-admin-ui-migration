@@ -26,6 +26,7 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert(names.includes('plugin.json'));
     assert(names.includes('skills/react-admin-ui-migration/SKILL.md'));
     assert(names.includes('skills/react-admin-ui-migration/references/page-layout.md'));
+    assert(names.includes('skills/react-admin-ui-migration/references/version-upgrade.md'));
     assert(names.includes('skills/react-admin-ui-migration/assets/baseline.json'));
     assert(names.includes('skills/react-admin-ui-migration/scripts/scan-candidates.mjs'));
     assert(!names.some((name) => /^(?:tests|scripts|node_modules|\.git|\.agents)\//.test(name)));

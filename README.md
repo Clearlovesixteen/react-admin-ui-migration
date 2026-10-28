@@ -38,6 +38,8 @@ codex plugin add react-admin-ui-migration@gancao-ui-migration
 使用 $react-admin-ui-migration，把当前旧后台迁到新版 UI，保留业务行为。
 ~~~
 
+执行迁移时，Agent 会核对组件的声明、锁定和实际版本，查询目标项目 registry，选择兼容的 3.x 稳定版，并在迁移范围内完成必要安装和锁文件更新。版本查询需要能访问目标 registry；失败会记录为未核实。允许旧版迁到已确认的 3.x 目标，不无条件使用 latest、越出目标主版本范围或降级。只读检查或用户固定版本时遵守相应限制。详细规则见 `skills/react-admin-ui-migration/references/version-upgrade.md`。
+
 ## 更新
 
 维护者同步 UI 基线、更新规则并提升版本，检查通过后推送 main。同学刷新插件源：
@@ -50,6 +52,8 @@ codex plugin list --marketplace gancao-ui-migration --json
 核对安装版本，按客户端提示重新加载插件或开始新会话。main 为更新通道，固定旧标签的安装不会自动跟进。未在同学客户端实测前，不承诺后台静默更新或旧对话热更新。
 
 更新插件会更新 skill、参考资料、工具与模板；已复制进业务项目的 PageLayout 属于项目代码，不会自动覆盖。需要更新已迁 UI 时，再次调用本 skill 比较差异并完成项目适配。
+
+刷新插件源只更新迁移 skill；目标后台的组件版本查询和依赖升级在调用 skill 执行迁移时进行。单独运行候选扫描器仍是本地只读盘点。
 
 其他 Agent 可以读取本仓库 `skills/react-admin-ui-migration/SKILL.md`，或者按其标准 skill 安装方式接入。不要假定其他 Agent 能自动识别 Codex 插件源；安装/更新方式须按对应客户端验证。
 
