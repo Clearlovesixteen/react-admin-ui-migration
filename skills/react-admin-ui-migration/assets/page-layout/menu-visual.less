@@ -1,0 +1,81 @@
+// WMS 菜单独立视觉基线；不改变表单、按钮等 Ant Design 全局文本色。
+@page-menu-text: #5d5f67;
+@page-menu-group-text: rgba(0, 0, 0, 0.65);
+@page-menu-active: #2d75d2;
+@page-menu-selected-bg: rgba(86, 154, 222, 0.1);
+@page-menu-hover-bg: rgba(0, 0, 0, 0.05);
+
+.page-layout .page-layout-menu {
+  .page-layout-menu-button {
+    color: @page-menu-text;
+
+    &:hover { background-color: @page-menu-hover-bg; }
+
+    &.is-selected {
+      color: @page-menu-active;
+      font-weight: 400;
+      background-color: @page-menu-selected-bg;
+
+      &:hover { background-color: @page-menu-hover-bg; }
+    }
+
+    &:disabled { color: @disabled-color; }
+  }
+
+  .page-layout-menu-level-1 > .page-layout-menu-item > .page-layout-menu-button,
+  .page-layout-menu-level-1 > .page-layout-menu-collapsed-trigger > .page-layout-menu-item > .page-layout-menu-button {
+    color: @page-menu-group-text;
+    font-weight: 400;
+
+    &.is-open { font-weight: 700; }
+
+    &.has-selected-child:not(.is-open):not(.is-selected) {
+      color: #333;
+      font-weight: 600;
+    }
+
+    &.is-selected {
+      color: @page-menu-active;
+      background-color: @page-menu-selected-bg;
+    }
+
+    &:disabled { color: @disabled-color; }
+  }
+
+  &.is-collapsed .page-layout-menu-level-1 .page-layout-menu-item.is-selected-branch > .page-layout-menu-button {
+    color: @page-menu-active;
+    background-color: @page-menu-selected-bg;
+  }
+
+  .page-layout-menu-expand-icon { font-size: 16px; }
+  .page-layout-menu-dot { background-color: #999; }
+}
+
+.page-layout-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: -0.125em;
+
+  > svg { display: block; }
+}
+
+.page-layout-menu-popup {
+  .page-layout-menu-button {
+    color: @page-menu-text;
+
+    &:hover, &:focus-visible { background-color: @page-menu-hover-bg; }
+
+    &.is-selected {
+      color: @page-menu-active;
+      font-weight: 700;
+      background-color: @page-menu-selected-bg;
+    }
+
+    &:disabled { color: @disabled-color; }
+  }
+
+  .page-layout-menu-expand-icon { font-size: 16px; }
+  .page-layout-menu-dot { background-color: #999; }
+}

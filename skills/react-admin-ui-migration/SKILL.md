@@ -38,6 +38,7 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 | 层 | 要确认的内容 |
 | --- | --- |
 | 组件 | 本地源码还是 npm 包、锁定版本、真实导出、表单/列表/弹窗/Tabs API |
+| 样式 | Ant Design 基础 CSS、组件扩展样式、主题变量、旧全局/颜色类、构建对包内引用的处理范围 |
 | 外壳 | 现有 Layout 位置、Router 版本、菜单真源、权限过滤、外链与重定向 |
 | 状态 | KeepAlive、query/state、最近访问页签、持久化 key |
 | 平台 | 账户退出、文件中心、我的应用、预发切换等原有功能及对应接口 |
@@ -55,9 +56,13 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 旧包 `base-element-react` 与新包 `@gancao-web/base-element-react` 不视为等价别名。需要升级时使用目标包管理器，保留目标 React/Ant Design 等环境；不要为了迁 UI 一并复制维护仓库的 Vite、TypeScript 或 lint 版本。
 
+包管理器以目标 README、CI、packageManager 和原锁文件共同确认；扫描器会报告多锁文件及 pnpm 安装布局线索。声明版本正确不代表 node_modules 的安装方式正确，不自动删除用户已有的另一份锁文件。
+
 随包展示模板适用于 React/Ant Design 4。目标使用 Ant Design 5 或其他框架时，不直接覆盖或强制降级；核实可复用的迁移单元，并说明模板不适用的部分。
 
 只有确认新入口提供等价能力后才切换业务导入与初始化。锁文件由目标包管理器安装时更新，并核实实际解析与安装版本。保留既有 request/upload/toast/loading/登录/日志配置。存在项目专属组件扩展时先迁移其所有使用方，不直接删除本地组件目录。
+
+切换组件入口时必读 [样式、主题与浏览器验收](references/styles-and-runtime.md)。确认 Ant Design 基础样式覆盖包内间接引用和 portal 浮层；变量导入不能代替控件 CSS。随包 [主题快照](assets/theme/antd4.ts) 通过目标已有 Less 管线合并，BaseElement.use 不会自动应用项目主题。
 
 ## 3. 迁移项目级 PageLayout
 
@@ -73,6 +78,8 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 先完成纯展示层，再接目标项目的行为。Shell 不直接读取用户 Store、Router、环境变量或业务 API；它接收已经过滤权限的菜单和业务回调。
 
+菜单视觉也属于模板闭包：一并迁入本地图标目录、MenuIcon 和 menu-visual.less，接好目标图标名称的解析与必要的语义映射。按 [外壳接入](references/page-layout.md) 对照实际菜单普通/展开/选中/收起及浮层状态，不能用旧的通用 Ant Design 图标和全局次级文字色代替 WMS 菜单基线。
+
 保持一个正式 Layout 入口。如果路径调整，同步路由配置、动态 glob、导入和文档；外部系统依赖旧入口时先保持兼容。不要新增无人使用的第二套 Layout。
 
 ## 4. 迁移页面
@@ -83,12 +90,14 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 2. 组合筛选使用 select-input，保持最终 API 参数映射、默认值和联动。
 3. BasePage children 中的列表汇总迁入 paginationLeftRender，保留响应数据和展示语义。
 4. 内容 Tabs 使用真实的 lib/value/children API；保持原有激活值、URL/存储和销毁语义。
-5. 弹窗、抽屉、操作列和必要滚动适配；证实新布局接管后再清理旧补丁。
+5. 弹窗、抽屉、操作列和必要滚动适配；确认宽表列宽、数字控件及响应式搜索，再清理旧补丁和旧作用域颜色类。
 
 每组先迁一个代表实现，完成代码核对和目标项目允许的静态检查，再处理同形态页面。复杂页面逐个适配，不能凭正则命中批量删配置。
 
 ## 5. 核验与交付
 
 按 [验收与覆盖边界](references/verification.md) 逐项核对。遵循目标 AGENTS.md 的验证要求；若仅允许 lint，就不额外启动服务、浏览器、构建或测试。命令不存在时如实说明，不照抄参考项目的脚本名。
+
+允许浏览器时用实际页面验收样式和交互；修改前后保留同一场景的截图/尺寸证据，至少打开代表下拉、级联、编辑弹窗与只读场景。可用 [只读样式检查表达式](scripts/inspect-ui-styles.js) 辅助确认已挂载控件。样式被 mock 的组件测试不能证明视觉完成；真实 UI 问题应以编译产物/浏览器验证闭环。
 
 交付列出组件升级前/候选/最终版本、兼容依据与查询/安装结果，以及已完成单元、未完成项与原因、实际运行的检查、待用户验证的交互。不能把扫描结束、编译通过或模板落地等同于完整业务验收；未经真实迁移测量，不承诺固定自动化比例。

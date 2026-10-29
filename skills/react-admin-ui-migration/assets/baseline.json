@@ -7,7 +7,30 @@
     "antd": "^4.24.1",
     "@ant-design/icons": "^5.0.1"
   },
-  "extraction": "只包含项目展示层；排除业务入口、RouteTabs、用户/权限 Store、平台 API、品牌资源和固定平台组件。",
+  "menuVisual": {
+    "name": "wms-menu",
+    "colors": {
+      "text": "#5d5f67",
+      "group": "rgba(0, 0, 0, 0.65)",
+      "active": "#2d75d2",
+      "selectedBackground": "rgba(86, 154, 222, 0.1)"
+    },
+    "icons": {
+      "family": "gancao-line",
+      "count": 21
+    },
+    "sources": [
+      {
+        "path": "src/layout/PageLayout/components/NewMenu/index.less",
+        "sha256": "70b3eed6b056d826526ed0ac3e532318c1647113b048edacd1f1a35d9c6b2736"
+      },
+      {
+        "path": "src/components/GetIcon/index.tsx",
+        "sha256": "9d66cf3cdb56f4cca05aee0b18059f01ee09370f935f37eb43c210e4e7d70737"
+      }
+    ]
+  },
+  "extraction": "包含项目展示层、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台 API、品牌资源、UnoCSS 和固定平台组件。",
   "sources": [
     {
       "path": "src/components/PageLayout/config.ts",
@@ -40,6 +63,25 @@
     {
       "path": "src/components/PageLayout/index.less",
       "sha256": "d7aeec280d4949bc332ecadf854e641049e7cae59d54a518d570f8aa3bbb4494"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/menu-visual/MenuIcon.tsx",
+      "sha256": "73a1b0ce86651a15a83fb43ec599f7baa0adcc038ba964d67a724496f2bca712"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/menu-visual/menu-icons.json",
+      "sha256": "dce44e2fc1af375b91e151af52b28edd048658f92dce0ebfc5fd7ec70e021577"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/menu-visual/menu-visual.less",
+      "sha256": "781d5dd74ff88dac35148c0f6d38cdacb22eccac2a26a3d5b74042ac2f0188fa"
+    },
+    {
+      "path": "config/theme.ts",
+      "sha256": "b1f5aefa265929051490665f055993babf1eea299beb73921b1b6b61fedd5244"
     }
   ],
   "artifacts": [
@@ -57,7 +99,7 @@
     },
     {
       "path": "assets/page-layout/components/Menu.tsx",
-      "sha256": "d993bd1f8ea4de31d1696dc4874c6a86c75c5610d21e2ca7812cc7d3632fa17f"
+      "sha256": "8dfbc7fa6d500b13498a89d8cff325106d4077c0b999a9932ef83e95819953ec"
     },
     {
       "path": "assets/page-layout/components/MenuSearch.tsx",
@@ -73,7 +115,23 @@
     },
     {
       "path": "assets/page-layout/index.less",
-      "sha256": "facfeee339479daccad860de497d616cd21040cdd29c2febccbfd1d0ce821c51"
+      "sha256": "4e4b5426ed2e7fa615e964045f81306f8853cc5ac716c66421330871dcf46b47"
+    },
+    {
+      "path": "assets/page-layout/components/MenuIcon.tsx",
+      "sha256": "73a1b0ce86651a15a83fb43ec599f7baa0adcc038ba964d67a724496f2bca712"
+    },
+    {
+      "path": "assets/page-layout/menu-icons.json",
+      "sha256": "dce44e2fc1af375b91e151af52b28edd048658f92dce0ebfc5fd7ec70e021577"
+    },
+    {
+      "path": "assets/page-layout/menu-visual.less",
+      "sha256": "781d5dd74ff88dac35148c0f6d38cdacb22eccac2a26a3d5b74042ac2f0188fa"
+    },
+    {
+      "path": "assets/theme/antd4.ts",
+      "sha256": "dd3b8c78703512789fb3802ba205deb8fa5449cea06d9f27f948782d01a5c676"
     }
   ]
 }

@@ -7,6 +7,7 @@
 ## 1. 确认当前实际版本和执行位置
 
 - 读取目标 AGENTS.md、packageManager、锁文件、Node 版本和工作区配置，确认应用所在 package 与安装命令的工作目录。保留原包管理器和依赖所属的 dependencies/devDependencies 等位置。
+- 对照 README/CI 与 node_modules 安装布局；多份锁文件不代表允许切换包管理器，pnpm 严格布局也不等于 npm 原有扁平依赖。模块无法解析时先恢复已确认的安装方式，保留用户文件，不用换框架/批量升级掩盖问题。
 - 分别记录 package.json 声明范围、锁文件解析版本、node_modules 实际版本，并追踪业务 import/路径别名。扫描器会报告声明值和已安装新包元数据，不能代替锁文件及别名检查。
 - 存在本地组件、workspace/file/link/git 依赖或 npm 别名时，确认真正加载的实现和独有扩展。安装一个没有被页面引用的新包不能算完成升级；迁到包入口前先核对扩展的等价能力。
 - package.json 的 ^3.0.0、skill 的 3.0.0 基线和维护仓库源码版本均不能证明当前实际安装版本或 registry 已发布版本。

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { DownOutlined, ProfileOutlined } from '@ant-design/icons';
+import PageLayoutMenuIcon from './MenuIcon';
 import { Popover } from 'antd';
 import {
   createPageLayoutMenuIndex,
@@ -62,7 +62,7 @@ function PageLayoutMenu({
           const icon =
             item.icon ??
             (level === 1 ? (
-              <ProfileOutlined className="page-layout-menu-icon" />
+              <PageLayoutMenuIcon name="gc-quanbuyingyong" />
             ) : level >= 3 ? (
               <span className="page-layout-menu-dot" aria-hidden="true" />
             ) : null);
@@ -114,7 +114,7 @@ function PageLayoutMenu({
                 {icon}
                 <span className="page-layout-menu-label">{item.label}</span>
                 {hasChildren && (
-                  <DownOutlined className="page-layout-menu-expand-icon" aria-hidden="true" />
+                  <PageLayoutMenuIcon name="gc-down" className="page-layout-menu-expand-icon" />
                 )}
               </span>
             </button>

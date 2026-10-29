@@ -1,0 +1,23 @@
+{
+  "name": "wms-menu",
+  "colors": {
+    "text": "#5d5f67",
+    "group": "rgba(0, 0, 0, 0.65)",
+    "active": "#2d75d2",
+    "selectedBackground": "rgba(86, 154, 222, 0.1)"
+  },
+  "icons": {
+    "family": "gancao-line",
+    "count": 21
+  },
+  "sources": [
+    {
+      "path": "src/layout/PageLayout/components/NewMenu/index.less",
+      "sha256": "70b3eed6b056d826526ed0ac3e532318c1647113b048edacd1f1a35d9c6b2736"
+    },
+    {
+      "path": "src/components/GetIcon/index.tsx",
+      "sha256": "9d66cf3cdb56f4cca05aee0b18059f01ee09370f935f37eb43c210e4e7d70737"
+    }
+  ]
+}

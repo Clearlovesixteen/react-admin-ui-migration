@@ -13,13 +13,20 @@ skills/react-admin-ui-migration/
   SKILL.md                        迁移入口
   references/                     Layout、组件差异与验收
   assets/page-layout/             可复制到目标项目的展示模板
+  assets/theme/                   Ant Design 4/Less 主题变量快照
   assets/baseline.json            组件基线、源文件与产物指纹
   scripts/scan-candidates.mjs     只读扫描器
+  scripts/inspect-ui-styles.js    浏览器只读样式检查表达式
 scripts/                          维护、版本和打包检查
+resources/menu-visual/             WMS 菜单图形/独立配色的维护源
 tests/                            扫描器和分发契约验证
 ~~~
 
 `@gancao-web/base-element-react` 是 UI 组件库；本包是迁移工作流与资源包。PageLayout 模板在迁移时落入目标业务项目，不成为组件库公开 API。已有业务权限、Router、请求和平台入口通过目标项目自己的适配层接入。
+
+样式与主题是独立的迁移单元。包内 Ant Design 控件不保证经过目标应用的按需样式转换；迁移时需要确认完整基础 CSS、组件扩展样式及 Less 主题，实际展开级联、下拉和弹窗验收。扫描器会报告样式入口、旧颜色类及包管理器冲突线索；发现入口仍不代表运行时已验证。
+
+PageLayout 同时分发 WMS 菜单的本地线性图标、展开箭头及独立配色。目标图标名称由项目适配层解析，不从维护者电脑或源系统 CDN 运行；业务菜单含义、权限和导航仍由目标项目决定。
 
 ## 同学如何安装
 
@@ -74,7 +81,7 @@ node scripts/sync-baseline.mjs "<base-element-react仓库>"
 node scripts/sync-baseline.mjs "<base-element-react仓库>" --check
 ~~~
 
-该命令只提取展示层，排除源系统业务入口、固定平台接口、品牌图片和用户状态。规则发生变化时同步更新对应 references，不能只刷新快照。
+该命令提取展示层与 Less 主题变量，排除源系统业务入口、固定平台接口、品牌图片、UnoCSS 和用户状态。规则发生变化时同步更新对应 references，不能只刷新快照。
 
 使用 `npm run version:patch`、`version:minor` 或 `version:major` 同步包和插件版本；命令不会自动提交、打标签或发布。新增说明/修正规则通常提升 patch，新增兼容能力提升 minor，改变迁移契约或基线兼容范围提升 major。
 

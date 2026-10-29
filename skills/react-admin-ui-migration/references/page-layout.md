@@ -10,6 +10,8 @@
 
 复制后清点 import 闭包，保留目标项目自己的 brandLogo、brandTitle、背景和菜单图标。模板使用 Ant Design 主题变量，Less 入口已移除 Vite 专属的波浪线别名；目标构建仍需支持 Less 及其既有 antd 主题配置。
 
+模板中的 themes/default.less 只提供变量，不加载全部控件样式。先按 [样式与主题接入](styles-and-runtime.md) 补齐实际样式管线，再将随包 assets/theme/antd4.ts 合并到目标主题入口；不能把模板复制成功当作主题与浮层已迁移。
+
 ## 项目入口
 
 下面描述入口契约，不是可以照抄的业务文件：
@@ -38,7 +40,13 @@
 - collapsedStorageKey：沿用已有 key；原来不持久化就不随意新增持久化。
 - defaultOpenAll/defaultCollapsed：读取目标既有开关或明确采用新版默认值。
 
-需要字符串图标时在项目适配层转成 ReactElement；不要把源项目 iconfont 地址或机器路径带入模板。
+需要字符串图标时在项目适配层转成 ReactElement。随包的 components/MenuIcon.tsx 与 menu-icons.json 提供 WMS 同系列的本地线性图形（含 gc-shezhi、gc-cangchupeizhi、gc-wenjianzhongxin 等）；用 isPageLayoutMenuIconName 判断 gc-* 名称，未知名称按目标原解析器处理，不能只识别 ControlOutlined 就静默丢弃其他图标。保留目标实际图标含义和明确自定义 ReactElement，旧的通用占位图标可按菜单含义映射到同系列图标；不能把仓库图标套给内容管理。
+
+部分 Umi 路由 icon 字段会参与 Ant Design 图标代码生成，先核对生成规则；运行时还可能把字符串变成 ReactElement，映射时同时识别原始名称与对应组件类型，并保留明确的自定义图标。必要时在项目适配层映射，保留 Router 的原字段；浏览器必须确认最终 SVG 已变化，不能只检查源路由字符串。不要把源项目 iconfont CDN 地址、接口或机器路径带入模板，也不要为此升级路由框架。
+
+menu-visual.less 与模板 index.less 一起接入：WMS 普通项 #5d5f67、一级菜单 rgba(0,0,0,.65)、选中项 #2d75d2、底色 rgba(86,154,222,.1)。这些是菜单独立配色，不能从 Ant Design 的 text-color-secondary 或 primary 色透明度猜测；不要为改菜单而改变表单和按钮的全局文字色。展开、选中祖先、收起、hover、disabled 与 body 中的折叠浮层需要分别验收；比对底色前先把鼠标移出菜单，避免把 hover 色当作选中色。
+
+顶部快捷搜索与内容卡片左边缘共用侧栏宽度基线，品牌名称较短或较长都不能推移搜索框。模板使用 --page-layout-current-sidebar-width、--page-layout-header-padding-x 和 --page-layout-header-gap 计算品牌占位，收起时同步宽度并在存在 Logo 时隐藏品牌标题。项目响应式样式调整 Header 左右内边距或左侧间距时，修改对应变量；在正常与收起状态以及窄屏中用实际边界坐标核对，不能只补固定 margin-left。
 
 ## 菜单搜索和路由权限
 

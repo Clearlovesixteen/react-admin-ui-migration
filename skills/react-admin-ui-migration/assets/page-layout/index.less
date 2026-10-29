@@ -18,6 +18,9 @@
 }
 
 .page-layout {
+  --page-layout-current-sidebar-width: @page-layout-sidebar-width;
+  --page-layout-header-padding-x: 22px;
+  --page-layout-header-gap: 20px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -39,7 +42,7 @@
     justify-content: space-between;
     min-width: 0;
     height: @page-layout-header-height;
-    padding: 0 22px;
+    padding: 0 var(--page-layout-header-padding-x);
   }
 
   .page-layout-header-left,
@@ -53,7 +56,7 @@
 
   .page-layout-header-left {
     flex: 1;
-    gap: 20px;
+    gap: var(--page-layout-header-gap);
     overflow: hidden;
   }
 
@@ -62,8 +65,10 @@
   }
 
   .page-layout-brand {
-    flex: none;
+    flex: 0 0 calc(var(--page-layout-current-sidebar-width) - var(--page-layout-header-padding-x) - var(--page-layout-header-gap));
     gap: 8px;
+    overflow: hidden;
+    transition: flex-basis 0.2s ease;
   }
 
   .page-layout-brand-logo {
@@ -85,6 +90,8 @@
   }
 
   .page-layout-brand-title {
+    flex: 1;
+    min-width: 0;
     max-width: 320px;
     overflow: hidden;
     font-size: 20px;
@@ -169,6 +176,14 @@
     transition:
       width 0.2s ease,
       flex-basis 0.2s ease;
+  }
+
+  &.is-collapsed {
+    --page-layout-current-sidebar-width: @page-layout-sidebar-collapsed-width;
+
+    .page-layout-brand-logo + .page-layout-brand-title {
+      display: none;
+    }
   }
 
   &.is-collapsed .page-layout-sidebar {
@@ -633,6 +648,7 @@
 @media (prefers-reduced-motion: reduce) {
   .page-layout {
     .page-layout-sidebar,
+    .page-layout-brand,
     .page-layout-menu-button,
     .page-layout-menu-expand-icon,
     .page-layout-content-body.has-transition {
@@ -688,3 +704,5 @@
     }
   }
 }
+
+@import './menu-visual.less';

@@ -28,7 +28,7 @@ function checkLocalImport(file, specifier, boundary) {
   const candidate = resolve(dirname(file), specifier);
   assert(isInside(boundary, candidate), '模板导入不能越出模板目录：' + specifier);
   assert(
-    ['', '.ts', '.tsx', '.less', '/index.ts', '/index.tsx'].some((suffix) => existsSync(candidate + suffix)),
+    ['', '.ts', '.tsx', '.less', '.json', '/index.ts', '/index.tsx'].some((suffix) => existsSync(candidate + suffix)),
     '模板缺少依赖：' + file + ' -> ' + specifier,
   );
 }
@@ -68,9 +68,10 @@ export function validateRepository(root = defaultRoot) {
 
   const files = walk(root);
   const assetsRoot = join(skillRoot, 'assets/page-layout');
+  const themeRoot = join(skillRoot, 'assets/theme');
   for (const file of files) {
     const source = readFileSync(file, 'utf8');
-    if (file.endsWith('.mjs')) {
+    if (/\.m?js$/.test(file)) {
       const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
       assert.equal(result.status, 0, result.stderr);
     }
@@ -90,7 +91,8 @@ export function validateRepository(root = defaultRoot) {
     }
     if (isInside(assetsRoot, file) && file.endsWith('.less')) {
       for (const [, specifier] of source.matchAll(/@import\s+['"]([^'"]+)['"]/g)) {
-        assert.equal(specifier, 'antd/es/style/themes/default.less');
+        if (specifier.startsWith('.')) checkLocalImport(file, specifier, assetsRoot);
+        else assert.equal(specifier, 'antd/es/style/themes/default.less');
       }
     }
   }
@@ -99,11 +101,13 @@ export function validateRepository(root = defaultRoot) {
   assert.equal(baseline.componentPackage, '@gancao-web/base-element-react');
   for (const artifact of baseline.artifacts) {
     const path = resolve(skillRoot, artifact.path);
-    assert(isInside(assetsRoot, path), '基线产物必须属于展示模板');
+    assert(isInside(assetsRoot, path) || isInside(themeRoot, path), '基线产物必须属于展示模板或主题变量');
     assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex'), artifact.sha256, '模板变化后需同步基线：' + artifact.path);
   }
-  assert.equal(files.filter((file) => isInside(assetsRoot, file)).length, baseline.artifacts.length);
-  return { files: files.length, templates: baseline.artifacts.length, componentVersion: baseline.componentVersion };
+  const templateCount = files.filter((file) => isInside(assetsRoot, file)).length;
+  const themeCount = files.filter((file) => isInside(themeRoot, file)).length;
+  assert.equal(templateCount + themeCount, baseline.artifacts.length);
+  return { files: files.length, templates: templateCount, themes: themeCount, componentVersion: baseline.componentVersion };
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {

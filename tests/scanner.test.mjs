@@ -85,3 +85,52 @@ test('源码根目录为符号链接时也不会越界扫描', () => fixture(asy
   assert.equal(report.complete, false);
   assert(report.diagnostics.some((item) => item.file === 'src'));
 }));
+
+test('新版 npm 组件仅有主题变量导入时报告样式待验，不能将变量当成控件 CSS', () => fixture(async (root, write) => {
+  write('package.json', JSON.stringify({ dependencies: { '@gancao-web/base-element-react': '3.0.0' } }));
+  write('src/global.less', "@import '~antd/es/style/themes/default.less';\n");
+  write('node_modules/@gancao-web/base-element-react/package.json', JSON.stringify({ name: '@gancao-web/base-element-react', version: '3.0.0' }));
+  const report = await scanProject(root);
+  assert.equal(report.styleVerification, 'needs-runtime-check');
+  assert.equal(report.styleEntries[0].kind, 'variables-only');
+  assert.equal(report.complete, false);
+  assert(report.diagnostics.some((item) => item.level === 'warning' && item.message.includes('样式入口')));
+}));
+
+test('完整 Ant Design Less/CSS 入口可被发现，但仍明确未完成运行时验收', () => fixture(async (root, write) => {
+  write('package.json', JSON.stringify({ dependencies: { '@gancao-web/base-element-react': '3.0.0' } }));
+  write('src/global.less', "@import '~antd/dist/antd.less';\n");
+  write('src/main.tsx', "import 'antd/dist/antd.css';\nconst value = <span className={target.color}>状态</span>;");
+  const before = snapshot(root);
+  const report = await scanProject(root);
+  assert.equal(report.styleEntries.filter((item) => item.kind === 'full').length, 2);
+  assert.equal(report.styleVerification, 'entry-found-runtime-unverified');
+  assert.equal(report.summary['legacy-color-classes'], 1);
+  assert.equal(report.complete, true);
+  assert.deepEqual(snapshot(root), before);
+}));
+
+test('按需样式只作为入口证据，包内间接控件和 portal 样式仍需验证', () => fixture(async (root, write) => {
+  write('package.json', JSON.stringify({ dependencies: { '@gancao-web/base-element-react': '3.0.0' } }));
+  write('src/main.tsx', "import 'antd/es/table/style';\n");
+  const report = await scanProject(root);
+  assert.equal(report.styleEntries[0].kind, 'component');
+  assert.equal(report.styleVerification, 'needs-runtime-check');
+}));
+
+test('保留并报告多锁文件和安装布局冲突，不泄漏锁文件内容', () => fixture(async (root, write) => {
+  write('package.json', JSON.stringify({ packageManager: 'npm@6.14.18', engines: { node: '14.x' } }));
+  write('package-lock.json', JSON.stringify({ lockfileVersion: 1 }));
+  write('pnpm-lock.yaml', 'private_config: DO_NOT_PRINT_LOCK_CONTENT\n');
+  write('node_modules/.pnpm/.fixture', '');
+  write('src/index.ts', 'export const value = 1;');
+  const before = snapshot(root);
+  const report = await scanProject(root);
+  assert.deepEqual(report.lockFiles, ['package-lock.json', 'pnpm-lock.yaml']);
+  assert.equal(report.installationLayout, 'pnpm');
+  assert.equal(report.nodeEngines, '14.x');
+  assert.equal(report.complete, false);
+  assert(report.diagnostics.some((item) => item.message.includes('安装布局冲突')));
+  assert(!JSON.stringify(report).includes('DO_NOT_PRINT_LOCK_CONTENT'));
+  assert.deepEqual(snapshot(root), before);
+}));

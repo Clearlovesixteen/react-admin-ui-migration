@@ -10,7 +10,8 @@ import { validateRepository } from '../scripts/validate.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('完整资源闭包、版本与展示模板依赖可独立校验', () => {
-  assert.equal(validateRepository(root).templates, 8);
+  assert.equal(validateRepository(root).templates, 11);
+  assert.equal(validateRepository(root).themes, 1);
 });
 
 test('npm 实际打包后能离线解包并在消费者目录运行扫描器', () => {
@@ -27,6 +28,12 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert(names.includes('skills/react-admin-ui-migration/SKILL.md'));
     assert(names.includes('skills/react-admin-ui-migration/references/page-layout.md'));
     assert(names.includes('skills/react-admin-ui-migration/references/version-upgrade.md'));
+    assert(names.includes('skills/react-admin-ui-migration/references/styles-and-runtime.md'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/theme/antd4.ts'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/components/MenuIcon.tsx'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/menu-icons.json'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/menu-visual.less'));
+    assert(names.includes('skills/react-admin-ui-migration/scripts/inspect-ui-styles.js'));
     assert(names.includes('skills/react-admin-ui-migration/assets/baseline.json'));
     assert(names.includes('skills/react-admin-ui-migration/scripts/scan-candidates.mjs'));
     assert(!names.some((name) => /^(?:tests|scripts|node_modules|\.git|\.agents)\//.test(name)));
@@ -36,7 +43,7 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     mkdirSync(unpacked);
     const unpack = spawnSync('tar', ['-xzf', join(temporary, metadata.filename), '-C', unpacked], { encoding: 'utf8' });
     assert.equal(unpack.status, 0, unpack.stderr);
-    assert.equal(validateRepository(join(unpacked, 'package')).templates, 8);
+    assert.equal(validateRepository(join(unpacked, 'package')).templates, 11);
 
     const consumer = join(temporary, 'consumer');
     mkdirSync(join(consumer, 'src'), { recursive: true });

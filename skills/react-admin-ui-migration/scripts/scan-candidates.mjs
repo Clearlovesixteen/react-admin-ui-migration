@@ -17,6 +17,8 @@ const rules = [
   ['list-pages', /<(?:BasePage|BaseList)\b|\bBasePageConfig\b/, '检查列表页面、工具插槽与汇总数据链'],
   ['list-summary', /\b(?:paginationLeftRender|paginationExtraRender)\s*[:=]/, '确认当前版本的分页汇总 hook 和响应参数'],
   ['form-layout', /\b(?:listForm|itemCol|labelWidth|paddingX|scrollHeight|fitViewport|layoutMode)\s*[:=]/, '核对布局配置，不能仅凭命中就删除旧设置'],
+  ['style-loading', /(?:@import|import)\s*['"]~?antd\/(?:dist\/|(?:es|lib)\/.*style)/, '核对完整样式、主题变量或按需样式是否实际覆盖组件包间接使用的控件和浮层'],
+  ['legacy-color-classes', /className\s*=\s*(?:\{[^}]*\.color\b|['"](?:red|green|gray|blue|yellow)['"])/, '核对旧组件作用域中的颜色类；新版需要 BaseText 等对应的样式载体，不能只保留裸 className'],
   ['select-input', /\bcomp\s*:\s*['"]select-input['"]/, '核对组合字段的默认值、联动和请求参数映射'],
   ['legacy-page', /\b(?:PageListConfig|PageModalConfig|pageModal|filterRow|filterParam)\b|<BasePage\b[^>]*\bpage\s*=/, '检查更早的页面配置和过滤钩子是否兼容'],
 ];
@@ -48,6 +50,7 @@ export async function scanProject(projectPath) {
   const diagnostics = [];
   const findings = [];
   const sourceRoots = [];
+  const styleEntries = [];
   let inspectedFiles = 0;
   const relativePath = (path) => relative(project, path).replaceAll('\\', '/');
 
@@ -74,6 +77,13 @@ export async function scanProject(projectPath) {
             continue;
           }
           const source = await readFile(path, 'utf8');
+          for (const match of source.matchAll(/(?:@import\s*(?:\([^)]*\)\)\s*)?|import\s*)['"](~?antd\/[^'"]+)['"]/g)) {
+            const specifier = match[1].replace(/^~/, '');
+            const kind = /^antd\/dist\/antd(?:\.min)?\.(?:less|css)$/.test(specifier)
+              ? 'full'
+              : /\/style\/themes\//.test(specifier) ? 'variables-only' : 'component';
+            styleEntries.push({ file: relativePath(path), line: source.slice(0, match.index).split('\n').length, specifier, kind });
+          }
           inspectedFiles += 1;
           const lines = source.split(/\r?\n/);
           for (const [unit, pattern, reason] of rules) {
@@ -123,16 +133,43 @@ export async function scanProject(projectPath) {
     }
   }
 
+  const lockFiles = [];
+  for (const name of ['package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock']) {
+    try {
+      if ((await lstat(join(project, name))).isFile()) lockFiles.push(name);
+    } catch (error) {
+      if (error.code !== 'ENOENT') diagnostics.push({ level: 'warning', file: name, message: '锁文件状态未能读取', code: error.code });
+    }
+  }
+  const hasPnpmLayout = await exists(join(project, 'node_modules', '.pnpm'));
+  const npmLock = lockFiles.includes('package-lock.json') || lockFiles.includes('npm-shrinkwrap.json');
+  if (lockFiles.length > 1 && !(lockFiles.length === 2 && npmLock && lockFiles.every((name) => name === 'package-lock.json' || name === 'npm-shrinkwrap.json'))) {
+    diagnostics.push({ level: 'warning', message: '发现不同包管理器的锁文件；结合 README、CI 和安装布局确认包管理器，不自动删除用户文件或切换安装方式' });
+  }
+  if (hasPnpmLayout && (pkg.packageManager?.startsWith('npm@') || (npmLock && !lockFiles.includes('pnpm-lock.yaml')))) {
+    diagnostics.push({ level: 'warning', message: 'npm 元数据与 pnpm 安装布局冲突；先核对模块解析和原锁文件，再启动页面' });
+  }
+  const usesComponentPackage = !!(installedComponent || declared['@gancao-web/base-element-react']);
+  const needsStyleVerification = usesComponentPackage && !styleEntries.some((item) => item.kind === 'full');
+  if (needsStyleVerification) {
+    diagnostics.push({ level: 'warning', message: '未发现完整 Ant Design 样式入口；变量导入不生成控件 CSS，按需方案必须用实际构建和浏览器证明包内 Table/Cascader 等及 portal 浮层样式已生效' });
+  }
+
   return {
     schemaVersion: 1,
     project,
     packageManager: pkg.packageManager ?? null,
+    nodeEngines: pkg.engines?.node ?? null,
+    lockFiles,
+    installationLayout: hasPnpmLayout ? 'pnpm' : 'unconfirmed',
     declaredComponents: components,
     installedComponent: installedComponent ?? null,
     localComponentSource: await exists(join(project, 'src', 'base-element-react')),
     sourceRoots,
     ignoredDirectories: [...ignoredDirectories],
     inspectedFiles,
+    styleEntries,
+    styleVerification: !usesComponentPackage ? 'not-applicable' : needsStyleVerification ? 'needs-runtime-check' : 'entry-found-runtime-unverified',
     complete: !diagnostics.some((item) => item.level === 'warning'),
     summary: Object.fromEntries(rules.map(([unit]) => [unit, findings.filter((item) => item.unit === unit).length])),
     findings,
