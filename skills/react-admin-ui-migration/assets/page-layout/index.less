@@ -181,6 +181,10 @@
   &.is-collapsed {
     --page-layout-current-sidebar-width: @page-layout-sidebar-collapsed-width;
 
+    .page-layout-brand-logo {
+      margin-left: calc(var(--page-layout-current-sidebar-width) / 2 - var(--page-layout-header-padding-x) - 10px);
+    }
+
     .page-layout-brand-logo + .page-layout-brand-title {
       display: none;
     }
@@ -334,13 +338,19 @@
 
     &.is-collapsed {
       .page-layout-menu-level-1 > .page-layout-menu-item {
-        margin-right: 20px;
-        margin-left: 20px;
+        width: 40px;
+        margin-right: auto;
+        margin-left: auto;
       }
 
       .page-layout-menu-level-1 > .page-layout-menu-item > .page-layout-menu-button {
         justify-content: center;
         padding: 0;
+        border-radius: 8px;
+      }
+
+      .page-layout-menu-button-main {
+        justify-content: center;
       }
 
       .page-layout-menu-level-1

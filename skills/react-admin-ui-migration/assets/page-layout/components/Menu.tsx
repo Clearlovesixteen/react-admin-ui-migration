@@ -151,7 +151,7 @@ function PageLayoutMenu({
                 )
               }
             >
-              <div className="page-layout-menu-collapsed-trigger">{itemContent}</div>
+              {itemContent}
             </Popover>
           );
         })}

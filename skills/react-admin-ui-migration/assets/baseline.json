@@ -114,7 +114,7 @@
     },
     {
       "path": "assets/page-layout/components/Menu.tsx",
-      "sha256": "8dfbc7fa6d500b13498a89d8cff325106d4077c0b999a9932ef83e95819953ec"
+      "sha256": "e9a9beb5d8aa7c4fa991f0cac9ea4f8420a444966bf8bad6373440b44f8efe7f"
     },
     {
       "path": "assets/page-layout/components/MenuSearch.tsx",
@@ -130,7 +130,7 @@
     },
     {
       "path": "assets/page-layout/index.less",
-      "sha256": "47502a0247b7c867f366864f85dee81caeb295545736e09c8b70825a93746df8"
+      "sha256": "087cee983026c289d384b7d401738f5b6bda31863631caa158bd5f28ea640b37"
     },
     {
       "path": "assets/page-layout/components/MenuIcon.tsx",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "react-admin-ui-migration",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "React 后台新版 UI 迁移 Skill，包含项目级 PageLayout 模板、组件迁移规则和只读扫描工具",
   "extensions": {
     "com.openai": {

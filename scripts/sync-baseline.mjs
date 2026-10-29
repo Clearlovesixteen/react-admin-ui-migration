@@ -31,6 +31,7 @@ function extract(path, input) {
     output = replaceExactly(output, "import { DownOutlined, ProfileOutlined } from '@ant-design/icons';", "import PageLayoutMenuIcon from './MenuIcon';");
     output = replaceExactly(output, '<ProfileOutlined className="page-layout-menu-icon" />', '<PageLayoutMenuIcon name="gc-quanbuyingyong" />');
     output = replaceExactly(output, '<DownOutlined className="page-layout-menu-expand-icon" aria-hidden="true" />', '<PageLayoutMenuIcon name="gc-down" className="page-layout-menu-expand-icon" />');
+    output = replaceExactly(output, '<div className="page-layout-menu-collapsed-trigger">{itemContent}</div>', '{itemContent}');
   }
   if (path === 'types.ts') {
     output = replaceExactly(output, '  /** 文件中心内置能力；默认关闭，只能在当前 Layout 实例开启。 */\n  fileCenter?: boolean;\n', '');
@@ -82,6 +83,31 @@ function extract(path, input) {
   }
 
   &.is-collapsed .page-layout-sidebar {`);
+    output = replaceExactly(output, `    --page-layout-current-sidebar-width: @page-layout-sidebar-collapsed-width;
+`, `    --page-layout-current-sidebar-width: @page-layout-sidebar-collapsed-width;
+
+    .page-layout-brand-logo {
+      margin-left: calc(var(--page-layout-current-sidebar-width) / 2 - var(--page-layout-header-padding-x) - 10px);
+    }
+`);
+    output = replaceExactly(output, `      .page-layout-menu-level-1 > .page-layout-menu-item {
+        margin-right: 20px;
+        margin-left: 20px;
+      }`, `      .page-layout-menu-level-1 > .page-layout-menu-item {
+        width: 40px;
+        margin-right: auto;
+        margin-left: auto;
+      }`);
+    output = replaceExactly(output, `        justify-content: center;
+        padding: 0;
+      }`, `        justify-content: center;
+        padding: 0;
+        border-radius: 8px;
+      }
+
+      .page-layout-menu-button-main {
+        justify-content: center;
+      }`);
     output = replaceExactly(output, `    .page-layout-sidebar,
     .page-layout-menu-button,`, `    .page-layout-sidebar,
     .page-layout-brand,
