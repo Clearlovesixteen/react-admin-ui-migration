@@ -1,6 +1,6 @@
 ---
 name: react-admin-ui-migration
-description: 将 React/Ant Design 旧后台迁移到新版 base-element-react UI。适用于组件包升级、项目级 PageLayout、菜单、页签、搜索表单、列表汇总和旧布局清理；内置可复制的展示模板，业务接口和权限按目标项目适配。
+description: 将 React/Ant Design 旧后台迁移到新版 base-element-react UI。适用于组件包升级、项目级 PageLayout、必接的我的应用、菜单、页签、搜索表单、列表汇总和旧布局清理；内置可复制的展示模板，业务接口和权限按目标项目适配。
 ---
 
 # React 后台 UI 迁移
@@ -20,6 +20,7 @@ description: 将 React/Ant Design 旧后台迁移到新版 base-element-react UI
 - UI 组件使用 `@gancao-web/base-element-react` 的真实导出；当前模板基线见 [baseline.json](assets/baseline.json)。
 - **组件包不导出 PageLayout、Menu、RouteTabs，也没有 BaseElement.use().layout。** PageLayout 落在目标项目，自行拥有路由、权限、账户与平台功能。
 - 随包的 [PageLayout 模板](assets/page-layout/components/PageLayoutShell.tsx) 提供展示代码和样式；在目标项目中复制、适配后再引用，不能从插件缓存或 npm skill 包跨路径运行应用。
+- **我的应用是新版 UI 的必接功能。** 即使旧系统没有入口，也要接入随包应用面板、目标用户中心的真实应用列表、搜索及跳转；不能因旧系统未实现而标为“不适用”，也不能用静态应用或空数组假适配交付。
 - 包更新只更新 skill、参考资料和模板。已迁入业务项目的代码不会自动覆盖；后续再次调用本 skill，比较差异后按需更新。
 - 保留目标项目的 API、鉴权、权限码、路由、请求时机、缓存 key、字段语义、金额/时间单位和空态。视觉更新不自动授权改变这些业务契约。
 
@@ -41,10 +42,12 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 | 样式 | Ant Design 基础 CSS、组件扩展样式、主题变量、旧全局/颜色类、构建对包内引用的处理范围 |
 | 外壳 | 现有 Layout 位置、Router 版本、菜单真源、权限过滤、外链与重定向 |
 | 状态 | KeepAlive、query/state、最近访问页签、持久化 key |
-| 平台 | 账户退出、文件中心、我的应用、预发切换等原有功能及对应接口 |
+| 平台 | 必接的我的应用及用户中心鉴权；账户退出、文件中心、预发切换等原有功能及对应接口 |
 | 页面 | 普通列表、复杂筛选、弹窗/抽屉、汇总、业务 Tabs、自定义表格 |
 
 每个迁移单元标记“执行 / 已符合 / 受阻 / 不适用”，附源码位置、保持的行为和验证方式。缺少某个可选平台契约时，保留原实现，继续其他单元；不因工具缺失阻塞所有迁移。
+
+我的应用单独登记接入状态；扫描器的零命中表示需要补接。先从目标已有用户中心请求封装查找契约，确实无法确认时记录受阻并继续其他单元，不能把它当成可选平台功能静默省略。
 
 ## 2. 查询组件版本、执行必要升级并确认入口
 
@@ -72,13 +75,16 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 项目 PageLayout 入口
   ├─ 目标菜单与权限 -> PageLayoutMenuItem[]
   ├─ 目标导航、路由历史和 KeepAlive -> 选中项 / tabs / contentScroll
-  ├─ 目标账户与平台功能 -> account / headerActions
+  ├─ 目标用户中心应用列表 -> applicationPanel.loadApplications
+  ├─ 目标账户与其他平台功能 -> account / headerActions
   └─ PageLayoutShell -> 菜单、搜索、折叠、内容布局
 ~~~
 
 先完成纯展示层，再接目标项目的行为。Shell 不直接读取用户 Store、Router、环境变量或业务 API；它接收已经过滤权限的菜单和业务回调。
 
 菜单视觉也属于模板闭包：一并迁入本地图标目录、MenuIcon 和 menu-visual.less，接好目标图标名称的解析与必要的语义映射。按 [外壳接入](references/page-layout.md) 对照实际菜单普通/展开/选中/收起及浮层状态，不能用旧的通用 Ant Design 图标和全局次级文字色代替 WMS 菜单基线。
+
+我的应用面板、响应转换与 application-panel.less 一并迁入。用 applicationPanel={{ loadApplications }} 注入目标已鉴权的加载函数；真实请求和环境留在项目适配层。已有等价我的应用时合并接回，不重复添加入口。按 [我的应用接入](references/page-layout.md#我的应用必接) 完成真实列表、搜索、关闭重置、失败重试、新窗口链接和窄屏验收。
 
 保持一个正式 Layout 入口。如果路径调整，同步路由配置、动态 glob、导入和文档；外部系统依赖旧入口时先保持兼容。不要新增无人使用的第二套 Layout。
 

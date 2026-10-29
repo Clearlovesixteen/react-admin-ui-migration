@@ -30,7 +30,7 @@
       }
     ]
   },
-  "extraction": "包含项目展示层、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台 API、品牌资源、UnoCSS 和固定平台组件。",
+  "extraction": "包含项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。",
   "sources": [
     {
       "path": "src/components/PageLayout/config.ts",
@@ -80,6 +80,21 @@
       "sha256": "781d5dd74ff88dac35148c0f6d38cdacb22eccac2a26a3d5b74042ac2f0188fa"
     },
     {
+      "repository": "migration-skill",
+      "path": "resources/application-panel/ApplicationPanel.tsx",
+      "sha256": "e43a7be46490c013dc85af4d2f1ba557c52445fb5792d9ce42a410c80a835be5"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/application-panel/applications.ts",
+      "sha256": "14cc8baaea0fcd26e23940dc8b596e1bc4a2c3aaa361eca72892bdb4c66eb3a9"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/application-panel/application-panel.less",
+      "sha256": "1439f6fde673905403709c6892f8340ecb7980116528c29fc791d9a1bb1ba182"
+    },
+    {
       "path": "config/theme.ts",
       "sha256": "b1f5aefa265929051490665f055993babf1eea299beb73921b1b6b61fedd5244"
     }
@@ -91,11 +106,11 @@
     },
     {
       "path": "assets/page-layout/types.ts",
-      "sha256": "3a4dc4f70852f66c67d11e73ffb592afca8cd772d6718ff71f9a08be5612dd10"
+      "sha256": "9c897641000a45cf7802b760a0e4c52a9c99e554cff037c95990719e03516dec"
     },
     {
       "path": "assets/page-layout/components/PageLayoutShell.tsx",
-      "sha256": "8944f7b5b09ea9dcd43d26fedf54ac2dd466461b20004978c113a5c72f6901e3"
+      "sha256": "0517c339499b402389a9b2ba255b2700284b42b363fb360e3d277359f62e5a00"
     },
     {
       "path": "assets/page-layout/components/Menu.tsx",
@@ -115,7 +130,7 @@
     },
     {
       "path": "assets/page-layout/index.less",
-      "sha256": "4e4b5426ed2e7fa615e964045f81306f8853cc5ac716c66421330871dcf46b47"
+      "sha256": "47502a0247b7c867f366864f85dee81caeb295545736e09c8b70825a93746df8"
     },
     {
       "path": "assets/page-layout/components/MenuIcon.tsx",
@@ -128,6 +143,18 @@
     {
       "path": "assets/page-layout/menu-visual.less",
       "sha256": "781d5dd74ff88dac35148c0f6d38cdacb22eccac2a26a3d5b74042ac2f0188fa"
+    },
+    {
+      "path": "assets/page-layout/components/ApplicationPanel.tsx",
+      "sha256": "e43a7be46490c013dc85af4d2f1ba557c52445fb5792d9ce42a410c80a835be5"
+    },
+    {
+      "path": "assets/page-layout/utils/applications.ts",
+      "sha256": "14cc8baaea0fcd26e23940dc8b596e1bc4a2c3aaa361eca72892bdb4c66eb3a9"
+    },
+    {
+      "path": "assets/page-layout/application-panel.less",
+      "sha256": "1439f6fde673905403709c6892f8340ecb7980116528c29fc791d9a1bb1ba182"
     },
     {
       "path": "assets/theme/antd4.ts",

@@ -12,6 +12,7 @@ const rules = [
   ['component-imports', /(?:from\s*|import\s*)['"](?:base-element-react(?:\/[^'"]*)?|@\/base-element-react(?:\/[^'"]*)?|(?:\.\.?\/)+(?:[^'"]*\/)?base-element-react(?:\/[^'"]*)?)['"]/, '检查旧包、本地组件或深层导入，确认新包的等价导出'],
   ['initialization', /\bBaseElement\.use\s*\(/, '核对全局配置、请求上传和组件默认值'],
   ['page-layout', /\b(?:PageLayout|PageLayoutShell|NewMenu|MenuSearch)\b/, '核对项目级外壳、菜单和 Header 接入'],
+  ['application-panel', /\b(?:ApplicationPanel|PageLayoutApplicationPanel|applicationPanel|getApplicationList|requestPageLayoutApplications)\b/, '我的应用是新版迁移必接项；核对用户中心真实列表、搜索、跳转和异常反馈，候选命中不代表已验收'],
   ['route-cache', /\b(?:useAliveController|KeepAlive|refreshScope|dropScope|useRouteHistory)\b/, '核对路由历史、参数恢复和缓存生命周期'],
   ['content-tabs', /<(?:Tabs|BaseTabs)\b/, '核对页签数据结构、受控值和内容生命周期'],
   ['list-pages', /<(?:BasePage|BaseList)\b|\bBasePageConfig\b/, '检查列表页面、工具插槽与汇总数据链'],

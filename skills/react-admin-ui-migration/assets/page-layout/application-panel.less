@@ -1,0 +1,190 @@
+.page-layout {
+  .page-layout-platform-trigger {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 14px;
+    line-height: 20px;
+    color: @text-color;
+    white-space: nowrap;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: @primary-color;
+      background-color: fade(@text-color, 4%);
+    }
+
+    &:focus-visible {
+      outline: 2px solid fade(@primary-color, 35%);
+      outline-offset: 2px;
+    }
+  }
+
+  .page-layout-platform-trigger-icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    font-size: 16px;
+    color: @text-color-secondary;
+  }
+
+}
+
+.page-layout-application-popover {
+  .ant-popover-inner {
+    overflow: hidden;
+    background: @component-background;
+    border-radius: 8px;
+    box-shadow: @box-shadow-base;
+  }
+
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+}
+
+.page-layout-application-content {
+  display: flex;
+  flex-direction: column;
+  width: 408px;
+  max-width: calc(100vw - 32px);
+
+  .page-layout-application-search {
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid @border-color-split;
+  }
+
+  .page-layout-application-search-input .ant-input-prefix {
+    margin-right: 8px;
+  }
+
+  .ant-spin-nested-loading,
+  .ant-spin-container {
+    min-height: 120px;
+  }
+
+  .page-layout-application-grid {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    max-height: 480px;
+    padding: 12px 16px;
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .page-layout-application-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 102px;
+    padding: 10px 8px;
+    color: @text-color;
+    text-decoration: none;
+    background: fade(@text-color, 3%);
+    border-radius: 8px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: @primary-color;
+      background: fade(@text-color, 7%);
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid fade(@primary-color, 35%);
+      outline-offset: -2px;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .page-layout-application-card-icon-wrapper {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .page-layout-application-card-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .page-layout-application-card-icon-fallback {
+    font-size: 32px;
+    color: @primary-color;
+  }
+
+  .page-layout-application-card-label {
+    width: 100%;
+    margin-top: 8px;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.page-layout-platform-empty,
+.page-layout-platform-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 24px 16px;
+}
+
+@media (max-width: 480px) {
+  .page-layout-application-content {
+    width: 300px;
+
+    .page-layout-application-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+  }
+}
+
+
+@media (max-width: 767px) {
+  .page-layout {
+    .page-layout-platform-trigger-label { display: none; }
+    .page-layout-header-divider { margin: 0 8px; }
+  }
+}

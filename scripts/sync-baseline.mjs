@@ -34,19 +34,17 @@ function extract(path, input) {
   }
   if (path === 'types.ts') {
     output = replaceExactly(output, '  /** 文件中心内置能力；默认关闭，只能在当前 Layout 实例开启。 */\n  fileCenter?: boolean;\n', '');
-    output = replaceExactly(output, '  /** 我的应用内置能力；默认关闭，只能在当前 Layout 实例开启。 */\n  applicationPanel?: boolean;\n', '');
+    output = replaceExactly(output, '  /** 我的应用内置能力；默认关闭，只能在当前 Layout 实例开启。 */\n  applicationPanel?: boolean;\n', '  /** 新版迁移需接入我的应用；使用目标项目已鉴权的加载函数。 */\n  applicationPanel?: false | { loadApplications: () => Promise<import(\'./utils/applications\').PageLayoutApplicationItem[]> };\n');
     output = output.replaceAll('内置平台能力之前的项目 Header 扩展。', '项目 Header 扩展，由目标项目提供真实功能。');
     output = output.replaceAll('内置平台能力之后的项目 Header 扩展。', '项目 Header 尾部扩展。');
   }
   if (path === 'components/PageLayoutShell.tsx') {
     for (const line of [
-      "import PageLayoutApplicationPanel from './ApplicationPanel';\n",
       "import PageLayoutFileCenter from './FileCenter';\n",
       '  fileCenter = false,\n',
-      '  applicationPanel = false,\n',
       '    fileCenter ? <PageLayoutFileCenter key="page-layout-file-center" /> : null,\n',
-      '    applicationPanel ? <PageLayoutApplicationPanel key="page-layout-application-panel" /> : null,\n',
     ]) output = replaceExactly(output, line, '');
+    output = replaceExactly(output, '<PageLayoutApplicationPanel key="page-layout-application-panel" />', '<PageLayoutApplicationPanel key="page-layout-application-panel" {...applicationPanel} />');
   }
   if (path === 'index.less') {
     output = replaceExactly(output, `.page-layout {
@@ -92,7 +90,7 @@ function extract(path, input) {
     output = removeSection(output, '\n  .page-layout-platform-trigger {', '\n  .page-layout-header-divider {');
     output = removeSection(output, '\n.page-layout-file-center-popover,', '\n.page-layout-menu-popup {');
     output = output.replaceAll('var(--app-font-medium)', 'var(--app-font-medium, 600)');
-    output += "\n@import './menu-visual.less';\n";
+    output += "\n@import './menu-visual.less';\n@import './application-panel.less';\n";
   }
   return output;
 }
@@ -125,6 +123,18 @@ export function prepareBaseline(sourceRepository) {
     origins.push({ repository: 'migration-skill', path: sourcePath, sha256: hash(content) });
     artifacts.push({ path: artifact, sha256: hash(content) });
   }
+  for (const [name, destination] of [
+    ['ApplicationPanel.tsx', 'components/ApplicationPanel.tsx'],
+    ['applications.ts', 'utils/applications.ts'],
+    ['application-panel.less', 'application-panel.less'],
+  ]) {
+    const sourcePath = 'resources/application-panel/' + name;
+    const content = readFileSync(join(repository, sourcePath), 'utf8');
+    const artifact = 'assets/page-layout/' + destination;
+    expected.set(artifact, content);
+    origins.push({ repository: 'migration-skill', path: sourcePath, sha256: hash(content) });
+    artifacts.push({ path: artifact, sha256: hash(content) });
+  }
   // 主题是组件外部的视觉依赖；仅提取 Less 变量，不分发 UnoCSS/业务构建配置。
   const themePath = 'config/theme.ts';
   const themeInput = readFileSync(join(sourceRoot, themePath), 'utf8').replaceAll('\r\n', '\n');
@@ -142,7 +152,7 @@ export function prepareBaseline(sourceRepository) {
     componentVersion: library.version,
     uiDependencies: Object.fromEntries(['react', 'antd', '@ant-design/icons'].map((name) => [name, rootPackage.dependencies[name]])),
     menuVisual: JSON.parse(readFileSync(join(repository, 'resources/menu-visual/source.json'), 'utf8')),
-    extraction: '包含项目展示层、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台 API、品牌资源、UnoCSS 和固定平台组件。',
+    extraction: '包含项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。',
     sources: origins,
     artifacts,
   };

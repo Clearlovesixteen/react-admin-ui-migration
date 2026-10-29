@@ -13,6 +13,7 @@ import {
   reconcilePageLayoutOpenKeys,
 } from '../utils/menu';
 import { readPageLayoutCollapsed, writePageLayoutCollapsed } from '../utils/storage';
+import PageLayoutApplicationPanel from './ApplicationPanel';
 import PageLayoutMenu from './Menu';
 import PageLayoutMenuSearch from './MenuSearch';
 import type { ReactElement, ReactNode } from 'react';
@@ -78,6 +79,7 @@ function renderAccount(account: PageLayoutAccount): ReactElement {
 function PageLayoutShell({
   menuItems,
   selectedKey,
+  applicationPanel = false,
   headerActions,
   headerTrailingActions,
   account,
@@ -126,6 +128,7 @@ function PageLayoutShell({
 
   const actionNodes = Children.toArray([
     ...(headerActions ?? []),
+    applicationPanel ? <PageLayoutApplicationPanel key="page-layout-application-panel" {...applicationPanel} /> : null,
     ...(headerTrailingActions ?? []),
   ]);
   const accountNode = account ? renderAccount(account) : null;

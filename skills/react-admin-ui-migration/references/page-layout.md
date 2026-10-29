@@ -4,7 +4,7 @@
 
 `assets/page-layout/` 是可复制的展示模板，基于当前 UI 的 Shell、Menu、MenuSearch、菜单索引和折叠存储提取。只依赖 React、Ant Design 4、@ant-design/icons 和 Less；没有业务别名、固定业务 API、用户 Store、Router 或品牌图片。
 
-模板没有业务入口 index.tsx，也没有 FileCenter、ApplicationPanel、RouteTabs 和 menu.tsx；这些入口涉及目标项目的数据和导航契约，须用其现有实现适配。模板中的 headerActions/headerTrailingActions 是纯展示插槽，不意味着组件库提供平台功能。
+模板提供 ApplicationPanel、纯响应转换与样式，通过注入加载函数接入我的应用。没有业务入口 index.tsx、FileCenter、RouteTabs 和 menu.tsx；业务请求、鉴权和导航契约由目标项目适配。headerActions/headerTrailingActions 是其他项目功能的展示插槽，不意味着组件库提供平台 API。
 
 将整个 page-layout 目录复制到目标项目现有 Layout 位置（例如 src/components/PageLayout），然后生成项目入口。已有同名文件先阅读合并，不直接整目录覆盖。
 
@@ -23,6 +23,7 @@
   brandLogo={targetLogo}
   brandTitle={targetTitle}
   account={{ name: username, menuItems: accountItems }}
+  applicationPanel={{ loadApplications: loadTargetApplications }}
   headerActions={existingPlatformEntries}
   tabs={routeTabsEnabled ? routeTabs : undefined}
   contentScroll={childOwnsScroll ? 'child' : 'container'}
@@ -74,10 +75,18 @@ BaseTabs 属于组件库，可以作为 RouteTabs 的渲染器；路由信息、
 - 禁止同时让 body、Layout 内容和表体承担同一段滚动。窄屏、少量数据、长筛选、页签和分页都需要检查。
 - 保留目标主题入口及颜色真源；需要新 UI 圆角/弹窗间距时从已安装组件与目标主题核对，不整份复制参考项目的 global.less。
 
-## 头部平台功能
+## 我的应用（必接）
 
-文件中心、我的应用、启动器、消息和预发入口属于项目。原来存在的功能必须在新 Header 接回，不能因为模板未包含就删除。
+新版 Header 必须包含我的应用，旧系统没有时也要补接。复制 components/ApplicationPanel.tsx、utils/applications.ts 与 application-panel.less，通过 applicationPanel={{ loadApplications }} 接入 Shell。该面板按首次打开加载，支持名称搜索、关闭清空搜索、成功结果在本实例缓存、失败重试及 Escape 关闭并返回焦点；加载中不显示空态，关闭后的过期响应不覆盖新请求。
 
-按目标接口确认鉴权、字段、搜索、分页、下载/跳转、空态、loading 与异常反馈；使用目标请求封装。缺少契约时保留原功能或记录受阻，不复制参考系统接口，也不实现返回空数组的假适配器。
+已核实的甘草用户中心契约是 POST /user/system/getAllSys，列表字段为 sysName/sysUrl/icon，标识可取 sysId/id；目标请求层通常已解包 data。优先复用目标用户中心封装的环境地址、uc-token 和登录失效处理；不从其他系统复制域名、令牌、请求 Store 或整套请求层。若目标使用不同接口/字段，由项目适配层映射为 PageLayoutApplicationItem[]，没有真实契约时记录受阻，不伪造应用、不吞异常返回空数组。
 
-已有功能可以通过 headerActions 接入纯展示模板。若目标项目已把平台组件做成 Layout 内置布尔开关，则保留目标实现，不为了模仿模板而改成另一套公共 API。
+normalizePageLayoutApplications 接受已解包数组或 { list }，支持 sysName/sysUrl 与 name/url 字段，保留 HTTP(S) 应用地址、图标和原 hash/query。错误顶层结构及全无有效地址的结果进入失败态。已有等价面板可复用并补齐验证，不能重复新增入口；若目标已内置布尔开关，保留其真实数据实现，不强制改成随包 props。
+
+实际打开并验证列表、搜索匹配与无结果、清空、关闭后重新打开、图标、新窗口链接 target/rel，以及窄屏双列、浮层最大高度和头部仍可使用。首次请求失败时显示重试，不能直接显示“暂无应用”。用户中心权限决定可见应用，不用本系统菜单权限树或 sysId 过滤替代应用列表权限。
+
+## 其他头部平台功能
+
+文件中心、其他启动器、消息和预发入口按项目既有功能接回，不能因为模板未包含就删除。确认其鉴权、字段、分页、下载/跳转、空态、loading 与异常反馈；使用目标请求封装。缺少契约时保留原功能或记录受阻。
+
+这些已有功能可通过 headerActions/headerTrailingActions 接入；保留它们与我的应用、账户的原顺序和副作用。我的应用不意味着同时新增文件中心或其他平台功能。

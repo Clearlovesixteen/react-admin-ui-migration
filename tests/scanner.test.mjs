@@ -24,6 +24,14 @@ function snapshot(root, prefix = '') {
   });
 }
 
+test('发现我的应用接入候选，不执行加载函数，也不把候选当成完整接入证明', () => fixture(async (root, write) => {
+  write('src/layout.tsx', 'export const ui = <PageLayoutShell applicationPanel={{ loadApplications }} />;');
+  const before = snapshot(root);
+  const report = await scanProject(root);
+  assert.equal(report.summary['application-panel'], 1);
+  assert.deepEqual(snapshot(root), before);
+}));
+
 test('发现旧包、旧页面、布局和汇总候选且不执行源码或写入目标', () => fixture(async (root, write) => {
   write('src/main.tsx', [
     "import { BasePage } from 'base-element-react';",

@@ -46,6 +46,8 @@ export type PageLayoutContentScroll = 'container' | 'child';
 export type PageLayoutShellProps = PageLayoutConfig & {
   menuItems: PageLayoutMenuItem[];
   selectedKey?: string;
+  /** 新版迁移需接入我的应用；使用目标项目已鉴权的加载函数。 */
+  applicationPanel?: false | { loadApplications: () => Promise<import('./utils/applications').PageLayoutApplicationItem[]> };
   /** 项目 Header 扩展，由目标项目提供真实功能。 */
   headerActions?: ReactNode[];
   /** 项目 Header 尾部扩展。 */
