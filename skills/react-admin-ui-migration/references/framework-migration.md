@@ -65,4 +65,12 @@ node "<skill目录>/scripts/prepare-framework.mjs" --output "<临时新空目录
 - AntD 4 完整 Less、SVG、~ 别名、theme、UnoCSS 和浏览器 polyfill 是独立构建项。自定义 Braft 需要的 global 兼容也要保留，Node 升级不替代浏览器能力。
 - 不为迁框架重复迁已符合组件库 3.x 的页面；禁止删除旧测试或全局忽略错误来获得绿色结果。
 
+## 合并和提交入口
+
+迁移后再合并旧分支时，逐项核对 package.json 的 scripts、生命周期、gitHooks/lint-staged、包管理器声明和对应锁文件。依赖已是 Vite 也可能被合回 umi dev/build/generate、umi-test 或 npm ci；此时属于混合执行链，不能把整个旧配置选入后继续提交。锁被合并删除时，优先恢复已确认迁移提交中的匹配锁，再做冻结安装；有有效依赖变化则重新按目标包管理器生成并验证。
+
+提交钩子也属于本机迁移边界：核对实际生效的 core.hooksPath/钩子文件、执行器与项目配置。旧 Yorkie 钩子可能指向已移除的 node_modules 入口；按当前项目保留必要校验并接回新工具链，不盲目删除团队钩子，不用 --no-verify 掩盖问题。复验应直接运行已阅读的实际钩子，避免为了测试而生成一次提交。
+
+核对 .nvmrc 指定版本与当前、已安装版本；声明版本并不会自动安装。确需安装时使用目标已有版本管理器，不通过降低项目要求解决本机缺少版本。保留当前合并状态；未获提交授权时，修复配置后停在可提交状态。
+
 完成检查见 [框架验收](framework-verification.md)；请求、登录与权限的项目差异见 [运行契约](request-and-login.md)。

@@ -89,6 +89,7 @@ export async function scanProject(projectPath) {
   const styleEntries = [];
   const rootConfigFiles = [];
   const environmentKeys = new Set();
+  let requestedNodeVersion = null;
   let inspectedFiles = 0;
   const relativePath = (path) => relative(project, path).replaceAll('\\', '/');
 
@@ -154,7 +155,7 @@ export async function scanProject(projectPath) {
   }
   // .umirc 和环境文件不在普通源码遍历范围；这里只返回文件/键名和分类，不输出值。
   for (const entry of await readdir(project, { withFileTypes: true })) {
-    if (!entry.isFile() || (!/^\.umirc(?:\.[^.]+)?\.[cm]?[jt]s$/.test(entry.name) && !/^vite\.config\.[cm]?[jt]s$/.test(entry.name) && !/^\.env(?:\..+)?$/.test(entry.name))) continue;
+    if (!entry.isFile() || (!/^\.umirc(?:\.[^.]+)?\.[cm]?[jt]s$/.test(entry.name) && !/^vite\.config\.[cm]?[jt]s$/.test(entry.name) && !/^\.env(?:\..+)?$/.test(entry.name) && entry.name !== '.nvmrc')) continue;
     const path = join(project, entry.name);
     if ((await stat(path)).size > 2 * 1024 * 1024) {
       diagnostics.push({ level: 'warning', file: entry.name, message: '根配置超过扫描上限，请单独核对' });
@@ -164,14 +165,26 @@ export async function scanProject(projectPath) {
     if (entry.name.startsWith('.env')) {
       const source = await readFile(path, 'utf8');
       for (const [, key] of source.matchAll(/^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=/gm)) environmentKeys.add(key);
+    } else if (entry.name === '.nvmrc') {
+      const value = (await readFile(path, 'utf8')).trim();
+      if (/^(?:v?\d+(?:\.\d+){0,2}|lts\/[\w*.-]+|node|stable)$/.test(value)) requestedNodeVersion = value;
+      else diagnostics.push({ level: 'warning', file: entry.name, code: 'NODE_VERSION_UNCONFIRMED', message: 'Node 版本声明不是可确认的版本或别名，请人工核对；不执行文件内容' });
     }
   }
 
   const declared = { ...pkg.devDependencies, ...pkg.dependencies };
+  // 依赖仍为 Vite 时，合并也可能单独带回旧 scripts；只报告键名，不输出/执行命令内容。
+  const scriptEntries = Object.entries(pkg.scripts ?? {}).filter(([, value]) => typeof value === 'string');
+  const legacyCommand = /(?:^|[;&|])\s*(?:(?:cross-env|env)\s+)?(?:[A-Za-z_]\w*=(?:[^\s"']+|"[^"]*"|'[^']*')\s+)*(?:(?:npx|pnpm\s+exec|yarn\s+exec)\s+)?umi(?:-test)?(?:\s|$)/;
+  const legacyScriptNames = scriptEntries.filter(([, command]) => legacyCommand.test(command)).map(([name]) => name);
+  if (legacyScriptNames.length) diagnostics.push({ level: 'warning', file: 'package.json', code: 'LEGACY_LIFECYCLE', message: '发现旧 Umi 执行脚本：' + legacyScriptNames.join(', ') + '；核对迁移与合并结果' });
+  const gitHookNames = Object.keys(pkg.gitHooks ?? {});
+  if (gitHookNames.length) diagnostics.push({ level: 'info', file: 'package.json', code: 'GIT_HOOKS_UNVERIFIED', message: '发现 gitHooks 声明；核对实际执行器、已安装依赖和 Node 版本，不以跳过钩子代替修复' });
   const legacyEvidence = [
     ...['umi','@umijs/preset-react','@umijs/test','dva','umi-request','gc-crypto-request'].filter((name) => declared[name]).map((name) => 'package:' + name),
     ...rootConfigFiles.filter((name) => name.startsWith('.umirc')),
     ...findings.filter((item) => item.unit === 'legacy-framework').map((item) => item.file + ':' + item.line),
+    ...legacyScriptNames.map((name) => 'script:' + name),
     ...((declared['react-router-dom']?.match(/\d+/)?.[0] ?? '6') < 6 ? ['package:react-router-dom-before-6'] : []),
   ];
   const modernEvidence = [
@@ -216,6 +229,14 @@ export async function scanProject(projectPath) {
     }
   }
   const hasPnpmLayout = await exists(join(project, 'node_modules', '.pnpm'));
+  const declaredManager = pkg.packageManager?.split('@')[0];
+  const expectedLocks = { pnpm: ['pnpm-lock.yaml'], yarn: ['yarn.lock'], npm: ['package-lock.json', 'npm-shrinkwrap.json'] }[declaredManager];
+  if (expectedLocks && !expectedLocks.some((name) => lockFiles.includes(name))) {
+    diagnostics.push({ level: 'warning', code: 'DECLARED_LOCK_MISSING', message: '声明的包管理器未发现对应锁文件；核对工作区根锁或合并删除，不自动新建/覆盖' });
+  }
+  if (declaredManager === 'pnpm' && scriptEntries.some(([, command]) => /(?:^|[;&|])\s*npm\s+(?:ci|install)(?:\s|$)/.test(command))) {
+    diagnostics.push({ level: 'warning', file: 'package.json', code: 'PACKAGE_MANAGER_SCRIPT_MISMATCH', message: '声明 pnpm 但脚本仍调用 npm ci/install；核对旧构建前置步骤，避免混用锁文件' });
+  }
   const npmLock = lockFiles.includes('package-lock.json') || lockFiles.includes('npm-shrinkwrap.json');
   if (lockFiles.length > 1 && !(lockFiles.length === 2 && npmLock && lockFiles.every((name) => name === 'package-lock.json' || name === 'npm-shrinkwrap.json'))) {
     diagnostics.push({ level: 'warning', message: '发现不同包管理器的锁文件；结合 README、CI 和安装布局确认包管理器，不自动删除用户文件或切换安装方式' });
@@ -240,6 +261,9 @@ export async function scanProject(projectPath) {
     project,
     packageManager: pkg.packageManager ?? null,
     nodeEngines: pkg.engines?.node ?? null,
+    requestedNodeVersion,
+    legacyScriptNames,
+    gitHookNames,
     lockFiles,
     installationLayout: hasPnpmLayout ? 'pnpm' : 'unconfirmed',
     declaredComponents: components,
