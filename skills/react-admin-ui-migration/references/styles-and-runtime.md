@@ -48,6 +48,14 @@ Ant Design 4 中：
 
 不要用通用 `!important`、隐藏横向溢出或删列掩盖缺失样式。
 
+## Vite 8 与旧 UMD 编辑器
+
+若旧编辑器/插件在懒加载时出现 `Table is not a function`、`BraftEditor.use is not a function`，先读取原始异常和已安装包的导出。Vite 8 在 `type: module` 的导入方把 CommonJS 的 `module.exports` 作为默认导入；旧 Braft 的 UMD 则把组件/插件放在 `default` 中，不能继续把整个导出对象当函数使用。见 [Vite 8 的 CommonJS 互操作说明](https://vite.dev/guide/migration#consistent-commonjs-interop)。
+
+对已经证实的这类入口，在目标专属编辑器处显式取 `Export.default ?? Export`，同时保留直接函数形状。不要给全部依赖盲目解包或启用全局旧互操作模式。CMS 的 Braft 2.3.9 / 表格插件 0.1.1 已在实际开发页面确认该问题；这些业务依赖不属于通用框架资源。
+
+Jest 的 CommonJS 转译可能自动解包，因此真实包单测通过仍不能排除此错误。回归分别覆盖实际包、浏览器中保留的导出包装，并打开开发服务和构建产物的文章页、弹窗与表格插入。旧插件在表单内的按钮也需验证：Braft 表格插入按钮省略 `type`，会触发外层表单提交；仅在该编辑器边界取消此按钮的默认提交，保留插入点击逻辑，再用真实 DOM form 事件和浏览器复验。
+
 ## 建立能变红的反馈
 
 浏览器可用且用户允许启动时，在修改前记录实际页面与症状，修改后复跑同一检查。除初始静态页面，还要展开浮层、翻页、滚动到宽表右端、打开编辑和只读场景，检查 Console 中真实异常。

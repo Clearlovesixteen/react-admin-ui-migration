@@ -1,0 +1,62 @@
+@media (max-width: 767px) {
+  .page-layout {
+    --page-layout-header-padding-x: 12px;
+    --page-layout-header-gap: 12px;
+
+    .page-layout-header {
+      gap: 8px;
+    }
+
+    .page-layout-brand-title {
+      max-width: 100px;
+      font-size: 16px;
+    }
+
+    .page-layout-content-body {
+      padding: 12px;
+    }
+  }
+}
+
+@media (max-width: 479px) {
+  .page-layout .page-layout-brand-title {
+    display: none;
+  }
+}
+
+// 四列搜索在中等视口退为两列，避免标签挤占控件可读空间。
+@media (min-width: 768px) and (max-width: 1199px) {
+  .page-layout .base-list-form > .base-form.base-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// 搜索 Grid 在窄屏退为单列，编辑表单继续使用各自的流式布局。
+@media (max-width: 767px) {
+  .page-layout .base-list-form > .base-form.base-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-layout .base-table .ant-table-pagination.ant-pagination {
+    row-gap: 8px;
+
+    .ant-pagination-total-text {
+      flex: 0 0 100%;
+      height: auto;
+      padding-right: 0;
+      line-height: 20px;
+    }
+
+    .ant-pagination-options {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      margin-left: 0;
+
+      .ant-pagination-options-size-changer {
+        margin-right: 0;
+      }
+    }
+  }
+}

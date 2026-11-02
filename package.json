@@ -1,7 +1,7 @@
 {
   "name": "@gancao-web/react-admin-ui-migration",
-  "version": "0.4.1",
-  "description": "React 后台新版 UI 迁移 Skill，包含项目级 PageLayout 模板、组件迁移规则和只读扫描工具",
+  "version": "1.0.0",
+  "description": "React 后台框架迁移 Skill，包含 Vite/Router/Store/SDK、项目级布局、平台能力与离线盘点资源",
   "type": "module",
   "private": true,
   "repository": {

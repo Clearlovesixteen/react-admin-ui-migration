@@ -63,7 +63,7 @@ BaseElement.use(migratedConfig);
 
 BaseElement.use 每次替换整份全局注册值，不是累积 patch。不要为了加入 UI 配置另调一次只含 list/table 的 use，导致 request、file、upload、modal 等既有配置丢失。组件解析时的默认值合并与这里的全局注册是不同步骤。
 
-request/upload/file 必须保留目标已有实现和实参协议；HTTP 适配不能假设 requestApi 接收多个位置参数。保留 pageKey、sizeKey、listKey、totalKey、rowKey 和 onShowRefresh 等原有协议及行为。pageinfo.total 只是某种后端响应路径，不是所有项目的标准。
+request/upload/file 保留目标实参协议；完整框架迁移将实现接到统一 SDK，仅迁 UI 时保留现有请求实现；HTTP 适配不能假设 requestApi 接收多个位置参数。保留 pageKey、sizeKey、listKey、totalKey、rowKey 和 onShowRefresh 等原有协议及行为。pageinfo.total 只是某种后端响应路径，不是所有项目的标准。
 
 上述 fitViewport 基线在 Layout 到列表的高度、flex、min-height 和滚动责任确认后使用。自定义滚动、复杂嵌套 Tabs、非满高页面先逐页判断，可在页面配置 fitViewport: false。defaultCollapsed 也不会强制原本没有折叠条件的搜索区收起。
 

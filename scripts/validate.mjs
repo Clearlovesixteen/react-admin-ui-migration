@@ -69,6 +69,7 @@ export function validateRepository(root = defaultRoot) {
   const files = walk(root);
   const assetsRoot = join(skillRoot, 'assets/page-layout');
   const themeRoot = join(skillRoot, 'assets/theme');
+  const frameworkRoot = join(skillRoot, 'assets/framework');
   for (const file of files) {
     const source = readFileSync(file, 'utf8');
     if (/\.m?js$/.test(file)) {
@@ -107,7 +108,31 @@ export function validateRepository(root = defaultRoot) {
   const templateCount = files.filter((file) => isInside(assetsRoot, file)).length;
   const themeCount = files.filter((file) => isInside(themeRoot, file)).length;
   assert.equal(templateCount + themeCount, baseline.artifacts.length);
-  return { files: files.length, templates: templateCount, themes: themeCount, componentVersion: baseline.componentVersion };
+  const manifest = readJson(join(skillRoot, 'assets/framework-manifest.json'));
+  const frameworkPackage = readJson(join(frameworkRoot, 'package.json'));
+  const external = new Set([
+    'react', 'react-dom/client', 'react/jsx-runtime', 'antd/es/locale/zh_CN', 'uno.css',
+    'node:url', 'node:fs', 'node:path', 'node:crypto', 'vite', 'unocss/vite',
+    ...Object.keys(frameworkPackage.dependencies), ...Object.keys(frameworkPackage.devDependencies),
+  ]);
+  for (const artifact of manifest.artifacts) {
+    const path = resolve(frameworkRoot, artifact.path);
+    assert(isInside(frameworkRoot, path), '框架资源路径越界');
+    const source = readFileSync(path, 'utf8');
+    assert.equal(createHash('sha256').update(source).digest('hex'), artifact.sha256, '框架资源变化后需重新同步：' + artifact.path);
+    assert(!source.includes('/Users/') && !source.includes('10013'), '框架不能依赖维护者路径或试点应用标识');
+    if (['.ts','.tsx','.mjs','.cjs'].includes(extname(path))) {
+      for (const [, specifier] of source.matchAll(/\b(?:from\s+|import\s*(?:\(\s*)?)['"]([^'"]+)['"]/g)) {
+        if (specifier.startsWith('.')) checkLocalImport(path, specifier, frameworkRoot);
+        else if (specifier.startsWith('@/')) checkLocalImport(join(frameworkRoot, 'src/__entry.ts'), './' + specifier.slice(2), frameworkRoot);
+        else assert(external.has(specifier), '框架出现未声明依赖：' + specifier);
+      }
+    }
+  }
+  assert.equal(files.filter((file) => isInside(frameworkRoot, file)).length, manifest.artifacts.length);
+  const example = readFileSync(join(frameworkRoot, '.env.example'), 'utf8');
+  assert(!/https?:\/\/|(?:token|secret|password)=\S+/i.test(example), '框架环境示例不能包含真实环境值或凭据');
+  return { files: files.length, templates: templateCount, themes: themeCount, framework: manifest.artifacts.length, componentVersion: baseline.componentVersion };
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {

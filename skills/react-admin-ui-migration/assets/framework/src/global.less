@@ -1,0 +1,77 @@
+// npm 组件间接使用 Ant Design 控件，应用完整编译基础结构样式。
+// 先加载完整 Ant Design 4 样式，再由组件和项目样式覆盖。
+@import '~antd/dist/antd.less';
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.mr-4 {
+  margin-right: 4px;
+}
+.mr-8 {
+  margin-right: 8px;
+}
+
+.flex-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-menu-list {
+  background-color: #ffffff;
+  padding: 4px 0;
+  border-radius: 2px;
+  outline: none;
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
+  .dropdown-menu-item {
+    padding: 5px 12px;
+    color: #000000d9;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+}
+
+// 弹窗通过 portal 挂在 body，窄屏适配不能限定在 .page-layout 下面。
+@media (max-width: 767px) {
+  .base-page-modal .ant-modal-body {
+    padding: 16px 20px !important;
+
+    .base-form.ant-form-inline:not(.base-form-grid) {
+      > .ant-form-item {
+        // 覆盖场景级联等实例保留的桌面固定宽度。
+        width: 100% !important;
+        max-width: 100%;
+        margin-right: 0;
+
+        > .ant-form-item-row {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: nowrap;
+
+          .ant-form-item-label,
+          .ant-form-item-control {
+            display: block;
+            flex: 0 1 auto;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            text-align: left;
+          }
+
+          .ant-form-item-label {
+            padding-bottom: 8px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.admin-route-loading { display: block; margin: 100px auto; }
+.admin-auth-upload { padding: 24px; }

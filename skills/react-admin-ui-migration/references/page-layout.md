@@ -1,5 +1,7 @@
 # 项目级 PageLayout 接入
 
+本文说明展示层与项目适配器分工。完整框架使用 [框架资源](../assets/framework)，包含 Router/Store/请求与文件中心；下文的纯展示资源排除项不限制完整框架迁移。
+
 ## 随包资产与依赖
 
 `assets/page-layout/` 是可复制的展示模板，基于当前 UI 的 Shell、Menu、MenuSearch、菜单索引和折叠存储提取。只依赖 React、Ant Design 4、@ant-design/icons 和 Less；没有业务别名、固定业务 API、用户 Store、Router 或品牌图片。

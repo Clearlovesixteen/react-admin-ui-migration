@@ -9,6 +9,12 @@ const ignoredDirectories = new Set([
 ]);
 const sourceExtensions = /\.(?:[cm]?[jt]sx?|less|css)$/i;
 const rules = [
+  ['legacy-framework', /(?:from\s*|import\s*)['"](?:umi|dva|@umijs\/[^'"]*|umi-request|gc-crypto-request)['"]|@@initialState|\b(?:getInitialState|patchRoutes)\b/, '迁到显式入口/Router/Store/SDK；保留原生命周期承担的业务职责，不用空兼容模块隐藏旧依赖'],
+  ['environment', /process\.env\.|import\.meta\.env\./, '将目标环境映射到统一入口；Vite 构建的 PROD 不等于业务生产环境，不能自动改资源/官网链接'],
+  ['user-state', /localStorage|useStoreUser|useModel|getStateUser/, '核对持久化命名空间、用户字段、换号动态 header、首次登录和退出清理'],
+  ['request-layer', /requestApi|requestUc|setRequestConfig|requestHandler|PostForUserCenter/, '统一请求链并核对 GAPI/UC/Java 分流、原 payload、响应码和上传返回地址'],
+  ['permission', /AuthRoute|AUTH_CONTROL|AUTH_OPEN|getUserPerm|getUserMenu|saveBatch/, '保留权限码/父子关系；区分菜单树和平铺列表，关闭时不等待接口，开启失败可重试；上传页可能触发写入'],
+  ['file-center', /FileCenter|fileCenter|requestPageLayoutFiles/, '补接文件中心真实分页、身份、搜索、下载与异常反馈'],
   ['component-imports', /(?:from\s*|import\s*)['"](?:base-element-react(?:\/[^'"]*)?|@\/base-element-react(?:\/[^'"]*)?|(?:\.\.?\/)+(?:[^'"]*\/)?base-element-react(?:\/[^'"]*)?)['"]/, '检查旧包、本地组件或深层导入，确认新包的等价导出'],
   ['initialization', /\bBaseElement\.use\s*\(/, '核对全局配置、请求上传和组件默认值'],
   ['page-layout', /\b(?:PageLayout|PageLayoutShell|NewMenu|MenuSearch)\b/, '核对项目级外壳、菜单和 Header 接入'],
@@ -27,6 +33,35 @@ const inspectedPackages = [
   'react', 'antd', '@ant-design/icons', 'base-element-react',
   '@gancao-web/base-element-react',
 ];
+const frameworkPackages = ['umi','@umijs/preset-react','@umijs/test','umi-request','gc-crypto-request','vite','typescript','react-router-dom','react-activation','@gancao-web/request','@base-web-kits/base-tools-web'];
+
+/** 屏蔽独占行的注释并保留行号；不解析/执行源码，也不误删 URL 和正则中的斜线。 */
+function maskCommentLines(source) {
+  let block = false;
+  return source.split('\n').map((original) => {
+    let line = original;
+    let offset = 0;
+    while (offset < line.length) {
+      if (block) {
+        const end = line.indexOf('*/', offset);
+        if (end === -1) return line.slice(0, offset) + ' '.repeat(line.length - offset);
+        line = line.slice(0, offset) + ' '.repeat(end + 2 - offset) + line.slice(end + 2);
+        offset = end + 2;
+        block = false;
+      } else {
+        const start = line.slice(offset).search(/\S/);
+        if (start === -1) break;
+        offset += start;
+        if (line.startsWith('//', offset)) return line.slice(0, offset) + ' '.repeat(line.length - offset);
+        if (!line.startsWith('/*', offset)) break;
+        block = true;
+        offset += 2;
+        line = line.slice(0, offset - 2) + '  ' + line.slice(offset);
+      }
+    }
+    return line;
+  }).join('\n');
+}
 
 async function exists(path) {
   try {
@@ -52,6 +87,8 @@ export async function scanProject(projectPath) {
   const findings = [];
   const sourceRoots = [];
   const styleEntries = [];
+  const rootConfigFiles = [];
+  const environmentKeys = new Set();
   let inspectedFiles = 0;
   const relativePath = (path) => relative(project, path).replaceAll('\\', '/');
 
@@ -77,7 +114,7 @@ export async function scanProject(projectPath) {
             diagnostics.push({ level: 'warning', file: relativePath(path), message: '源码超过 2 MiB，未扫描' });
             continue;
           }
-          const source = await readFile(path, 'utf8');
+          const source = maskCommentLines(await readFile(path, 'utf8'));
           for (const match of source.matchAll(/(?:@import\s*(?:\([^)]*\)\)\s*)?|import\s*)['"](~?antd\/[^'"]+)['"]/g)) {
             const specifier = match[1].replace(/^~/, '');
             const kind = /^antd\/dist\/antd(?:\.min)?\.(?:less|css)$/.test(specifier)
@@ -115,8 +152,44 @@ export async function scanProject(projectPath) {
   if (!sourceRoots.length || !inspectedFiles) {
     diagnostics.push({ level: 'warning', message: '未找到可扫描源码；请核对 monorepo 或自定义源码目录' });
   }
+  // .umirc 和环境文件不在普通源码遍历范围；这里只返回文件/键名和分类，不输出值。
+  for (const entry of await readdir(project, { withFileTypes: true })) {
+    if (!entry.isFile() || (!/^\.umirc(?:\.[^.]+)?\.[cm]?[jt]s$/.test(entry.name) && !/^vite\.config\.[cm]?[jt]s$/.test(entry.name) && !/^\.env(?:\..+)?$/.test(entry.name))) continue;
+    const path = join(project, entry.name);
+    if ((await stat(path)).size > 2 * 1024 * 1024) {
+      diagnostics.push({ level: 'warning', file: entry.name, message: '根配置超过扫描上限，请单独核对' });
+      continue;
+    }
+    rootConfigFiles.push(entry.name);
+    if (entry.name.startsWith('.env')) {
+      const source = await readFile(path, 'utf8');
+      for (const [, key] of source.matchAll(/^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=/gm)) environmentKeys.add(key);
+    }
+  }
 
   const declared = { ...pkg.devDependencies, ...pkg.dependencies };
+  const legacyEvidence = [
+    ...['umi','@umijs/preset-react','@umijs/test','dva','umi-request','gc-crypto-request'].filter((name) => declared[name]).map((name) => 'package:' + name),
+    ...rootConfigFiles.filter((name) => name.startsWith('.umirc')),
+    ...findings.filter((item) => item.unit === 'legacy-framework').map((item) => item.file + ':' + item.line),
+    ...((declared['react-router-dom']?.match(/\d+/)?.[0] ?? '6') < 6 ? ['package:react-router-dom-before-6'] : []),
+  ];
+  const modernEvidence = [
+    ...(declared.vite ? ['package:vite'] : []),
+    ...rootConfigFiles.filter((name) => name.startsWith('vite.config')),
+  ];
+  const architecture = {
+    kind: legacyEvidence.length ? (modernEvidence.length ? 'mixed' : 'legacy') : modernEvidence.length ? 'modern' : 'unknown',
+    action: legacyEvidence.length ? 'migrate-framework' : modernEvidence.length ? 'reconcile-framework' : 'inspect-entry',
+    legacyEvidence, modernEvidence,
+    units: [
+      ['entry', 'initialization'], ['request', 'request-layer'], ['identity', 'user-state'],
+      ['permissions', 'permission'], ['my-applications', 'application-panel'], ['file-center', 'file-center'], ['cache', 'route-cache'],
+    ].map(([unit, rule]) => ({
+      unit, status: findings.some((item) => item.unit === rule) ? 'evidence-found-unverified' : 'needs-inspection',
+      files: findings.filter((item) => item.unit === rule).map((item) => item.file),
+    })),
+  };
   const components = {};
   for (const name of inspectedPackages) {
     if (declared[name] !== undefined) components[name] = declared[name];
@@ -158,6 +231,12 @@ export async function scanProject(projectPath) {
 
   return {
     schemaVersion: 1,
+    architecture,
+    rootConfigFiles,
+    environmentKeys: [...environmentKeys].sort(),
+    declaredFramework: Object.fromEntries(frameworkPackages.filter((name) => declared[name]).map((name) => [
+      name, /^(?:[~^<>=\s]|\d)/.test(declared[name]) ? declared[name] : 'custom-source',
+    ])),
     project,
     packageManager: pkg.packageManager ?? null,
     nodeEngines: pkg.engines?.node ?? null,

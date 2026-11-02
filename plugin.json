@@ -1,14 +1,14 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "react-admin-ui-migration",
-  "version": "0.4.1",
-  "description": "React 后台新版 UI 迁移 Skill，包含项目级 PageLayout 模板、组件迁移规则和只读扫描工具",
+  "version": "1.0.0",
+  "description": "React 后台框架迁移与新版 UI，支持旧架构迁入和新架构补齐",
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "React 后台 UI 迁移",
-        "shortDescription": "迁移到新版组件和项目级 PageLayout，保留业务契约",
-        "longDescription": "为 React/Ant Design 后台提供 UI 迁移流程、组件版本查询与兼容升级、PageLayout 展示模板和候选扫描。版本查询使用目标 registry；权限、请求和平台功能按目标项目适配。",
+        "displayName": "React 后台框架迁移",
+        "shortDescription": "统一框架、请求、身份和 UI，保留业务合同",
+        "longDescription": "提供 Vite、React Router、Store、请求 SDK 与平台能力的离线迁移资源，区分旧/混合/新架构，按目标项目适配环境、接口、权限和业务，并执行真实验证。",
         "category": "Productivity",
         "capabilities": [
           "Read",
