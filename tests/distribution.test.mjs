@@ -10,7 +10,7 @@ import { validateRepository } from '../scripts/validate.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('完整资源闭包、版本与展示模板依赖可独立校验', () => {
-  assert.equal(validateRepository(root).templates, 14);
+  assert.equal(validateRepository(root).templates, 19);
   assert.equal(validateRepository(root).themes, 1);
 });
 
@@ -30,6 +30,8 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert(names.includes('skills/react-admin-ui-migration/references/version-upgrade.md'));
     assert(names.includes('skills/react-admin-ui-migration/references/styles-and-runtime.md'));
     assert(names.includes('skills/react-admin-ui-migration/assets/theme/antd4.ts'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/theme/preference.js'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/framework/src/components/PageLayout/theme/ThemeToggle.tsx'));
     assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/components/MenuIcon.tsx'));
     assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/menu-icons.json'));
     assert(names.includes('skills/react-admin-ui-migration/assets/page-layout/menu-visual.less'));
@@ -51,7 +53,7 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     mkdirSync(unpacked);
     const unpack = spawnSync('tar', ['-xzf', join(temporary, metadata.filename), '-C', unpacked], { encoding: 'utf8' });
     assert.equal(unpack.status, 0, unpack.stderr);
-    assert.equal(validateRepository(join(unpacked, 'package')).templates, 14);
+    assert.equal(validateRepository(join(unpacked, 'package')).templates, 19);
 
     const consumer = join(temporary, 'consumer');
     mkdirSync(join(consumer, 'src'), { recursive: true });
@@ -71,6 +73,8 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     ], { cwd: consumer, encoding: 'utf8', timeout: 10000 });
     assert.equal(generate.status, 0, generate.stderr);
     assert.equal(JSON.parse(generate.stdout).output, prepared);
+    const preference = spawnSync(process.execPath, ['--input-type=module', '-e', `import { readPageLayoutTheme, savePageLayoutTheme } from './src/components/PageLayout/theme/preference.js'; const data = new Map(); const storage = {getItem: k => data.get(k), setItem: (k,v) => data.set(k,v)}; if(readPageLayoutTheme('test',storage)!=='light') process.exit(1); savePageLayoutTheme('test','dark',storage); if(readPageLayoutTheme('test',storage)!=='dark') process.exit(1);`], { cwd: prepared, encoding: 'utf8' });
+    assert.equal(preference.status, 0, preference.stderr);
     assert.equal(readFileSync(join(prepared, '.npmrc'), 'utf8'), '@gancao-web:registry=https://web-registry.igancao.com/\n');
     assert(readFileSync(join(prepared, 'src/components/PageLayout/index.tsx'), 'utf8').includes('Outlet'));
   } finally {

@@ -46,6 +46,18 @@ export function prepareFramework(sourceRepository) {
       value = value.replace(/^import pageBackground .*\n/m, '')
         .replace(/background=\{.*pageBackground.*\}/, 'background="linear-gradient(180deg, #eaf0fc 0%, #f2f5f7 100%)"');
     }
+    if (path === 'src/components/PageLayout/index.tsx') {
+      const replacements = [
+        ["import './project.less';", "import { usePageLayoutTheme } from './theme/usePageLayoutTheme';\nimport PageLayoutThemeToggle from './theme/ThemeToggle';\nimport './theme/theme.less';\nimport './project.less';"],
+        ['  const location = useLocation();', "  const [theme, setTheme] = usePageLayoutTheme('page-layout-theme:' + env.VITE_APP_ID);\n  const location = useLocation();"],
+        ['    <PageLayoutShell', '    <PageLayoutShell\n      className={`page-layout-theme-${theme}`}\n      headerTrailingActions={[<PageLayoutThemeToggle key="theme" theme={theme} onChange={setTheme} />]}'],
+        ['background="linear-gradient(180deg, #eaf0fc 0%, #f2f5f7 100%)"', 'background={theme === \'dark\' ? \'#1d2c42\' : \'linear-gradient(180deg, #eaf0fc 0%, #f2f5f7 100%)\'}'],
+      ];
+      for (const [before, after] of replacements) {
+        if (!value.includes(before) || value.indexOf(before) !== value.lastIndexOf(before)) throw new Error('主题适配入口已变化，请审查：' + path);
+        value = value.replace(before, after);
+      }
+    }
     // 保留通用边界，避免把试点项目名称误当成框架要求。
     value = value.replaceAll('CMS', '目标项目').replaceAll('cms-login', 'admin-login')
       .replaceAll('cms-route-loading', 'admin-route-loading').replaceAll('cms-auth-upload', 'admin-auth-upload');

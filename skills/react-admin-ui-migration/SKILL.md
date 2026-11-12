@@ -11,6 +11,7 @@ description: 将 React/Ant Design 旧后台迁入统一的 Vite、React Router�
 
 - 默认框架目标是 Vite + React Router 6 + 命名空间 Store + @gancao-web/request + base-tools + base-element-react 3.x + AntD 4 / Less / UnoCSS。具体基线见 [框架清单](assets/framework-manifest.json)，组件视觉基线见 [UI 清单](assets/baseline.json)。基线用于复现，不等于所有依赖的最新版本。
 - 业务行为、API payload/响应、权限码、开放/关闭路由、提交与刷新语义、资源地址和专属编辑器保留；旧 Umi/请求等实现可以替换，但必须接回原职责。
+- 亮暗外框切换是新版迁移必接项：首次默认亮色，手动选择后持久化并在下次首次渲染恢复；沿用 MES 外框范围与已有有效偏好，见[主题偏好](references/theme-preference.md)。
 - 我的应用是新版迁移必接项；完整框架同时接文件中心、登录/退出、错误处理和可配置的页签/保活。原无保活时可保持关闭，不机械套用模板开关。
 - PageLayout 属于目标项目，组件包不导出 PageLayout/Menu/RouteTabs，没有 BaseElement.use().layout。
 - 所有资源相对实际 SKILL.md 目录解析，落入目标项目后运行；不跨插件缓存导入，不依赖维护者电脑、私有环境或源项目 CDN。

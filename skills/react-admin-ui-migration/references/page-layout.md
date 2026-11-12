@@ -79,6 +79,10 @@ BaseTabs 属于组件库，可以作为 RouteTabs 的渲染器；路由信息、
 - 禁止同时让 body、Layout 内容和表体承担同一段滚动。窄屏、少量数据、长筛选、页签和分页都需要检查。
 - 保留目标主题入口及颜色真源；需要新 UI 圆角/弹窗间距时从已安装组件与目标主题核对，不整份复制参考项目的 global.less。
 
+## 亮暗外框（必接）
+
+按[主题偏好](theme-preference.md)接入随包 theme 资源，默认亮色、手动选择持久化、首次渲染恢复。通过既有 className/background/headerTrailingActions 连接，保留原有头部入口和页面状态。已有能力核对后复用，MES 原暗色默认值不能直接带入新迁移目标。
+
 ## 我的应用（必接）
 
 新版 Header 必须包含我的应用，旧系统没有时也要补接。复制 components/ApplicationPanel.tsx、utils/applications.ts 与 application-panel.less，通过 applicationPanel={{ loadApplications }} 接入 Shell。该面板按首次打开加载，支持名称搜索、关闭清空搜索、成功结果在本实例缓存、失败重试及 Escape 关闭并返回焦点；加载中不显示空态，关闭后的过期响应不覆盖新请求。

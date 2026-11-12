@@ -161,6 +161,14 @@ export function prepareBaseline(sourceRepository) {
     origins.push({ repository: 'migration-skill', path: sourcePath, sha256: hash(content) });
     artifacts.push({ path: artifact, sha256: hash(content) });
   }
+  for (const name of ['preference.js', 'preference.d.ts', 'usePageLayoutTheme.ts', 'ThemeToggle.tsx', 'theme.less']) {
+    const sourcePath = 'resources/layout-theme/' + name;
+    const content = readFileSync(join(repository, sourcePath), 'utf8');
+    const artifact = 'assets/page-layout/theme/' + name;
+    expected.set(artifact, content);
+    origins.push({ repository: 'migration-skill', path: sourcePath, sha256: hash(content) });
+    artifacts.push({ path: artifact, sha256: hash(content) });
+  }
   // 主题是组件外部的视觉依赖；仅提取 Less 变量，不分发 UnoCSS/业务构建配置。
   const themePath = 'config/theme.ts';
   const themeInput = readFileSync(join(sourceRoot, themePath), 'utf8').replaceAll('\r\n', '\n');
@@ -177,8 +185,9 @@ export function prepareBaseline(sourceRepository) {
     componentPackage: library.name,
     componentVersion: library.version,
     uiDependencies: Object.fromEntries(['react', 'antd', '@ant-design/icons'].map((name) => [name, rootPackage.dependencies[name]])),
+    layoutTheme: JSON.parse(readFileSync(join(repository, 'resources/layout-theme/source.json'), 'utf8')),
     menuVisual: JSON.parse(readFileSync(join(repository, 'resources/menu-visual/source.json'), 'utf8')),
-    extraction: '包含项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。',
+    extraction: '包含默认亮色且持久化偏好的 MES 外框主题、项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。',
     sources: origins,
     artifacts,
   };

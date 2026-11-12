@@ -1,0 +1,157 @@
+.page-layout .page-layout-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+
+  .ant-switch {
+    min-width: 44px;
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+    vertical-align: -1px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+// 外框的暗色只覆盖外框，业务表单、表格和弹窗继续使用浅色主题。
+.page-layout.page-layout-theme-dark {
+  @chrome-text: #ced7e5;
+  @chrome-active: #fff;
+  @chrome-hover: rgba(255, 255, 255, 0.08);
+  @chrome-selected: #2d75d2;
+
+  .page-layout-brand-title,
+  .page-layout-account,
+  .page-layout-platform-trigger,
+  .page-layout-platform-trigger-icon,
+  .file-center-trigger .file-center-text,
+  .page-layout-file-center-trigger,
+  .page-layout-collapse-button {
+    color: @chrome-text;
+  }
+
+  .page-layout-brand-title {
+    color: @chrome-active;
+  }
+
+  .file-center-trigger img {
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+
+  .page-layout-account-button:hover,
+  .page-layout-account-button:focus-visible,
+  .page-layout-platform-trigger:hover,
+  .page-layout-platform-trigger:focus-visible,
+  .file-center-trigger:hover,
+  .page-layout-file-center-trigger:hover,
+  .page-layout-collapse-button:hover {
+    color: @chrome-active;
+    background-color: @chrome-hover;
+  }
+
+  .page-layout-header-divider {
+    background-color: rgb(255 255 255 / 14%);
+  }
+
+  .page-layout-menu-search {
+    background: rgb(232 238 247 / 20%);
+
+    .ant-select-selection-search-input,
+    .ant-select-selection-placeholder,
+    .page-layout-menu-search-icon {
+      color: @chrome-text;
+    }
+  }
+
+  .page-layout-menu {
+    .page-layout-menu-button,
+    .page-layout-menu-level-1 > .page-layout-menu-item > .page-layout-menu-button {
+      color: @chrome-text;
+
+      &:hover,
+      &:focus-visible {
+        color: @chrome-active;
+        background-color: @chrome-hover;
+      }
+
+      &.has-selected-child:not(.is-open, .is-selected) {
+        color: @chrome-active;
+      }
+
+      &.is-selected,
+      &.is-selected:hover {
+        color: @chrome-active;
+        background-color: @chrome-selected;
+      }
+
+      &:disabled {
+        color: rgb(206 215 229 / 40%);
+        background: transparent;
+      }
+    }
+
+    &.is-collapsed
+      .page-layout-menu-level-1
+      .page-layout-menu-item.is-selected-branch
+      > .page-layout-menu-button {
+      color: @chrome-active;
+      background-color: @chrome-selected;
+    }
+
+    .page-layout-menu-dot {
+      background-color: @chrome-text;
+    }
+  }
+}
+
+// 折叠菜单和快捷搜索渲染到 body；不染色文件中心、账户和业务控件浮层。
+:root[data-page-layout-theme='dark'] .page-layout-menu-popup {
+  color: #ced7e5;
+
+  &.ant-select-dropdown,
+  .ant-popover-inner,
+  .ant-popover-arrow-content {
+    background: #24344b;
+  }
+
+  .ant-popover-arrow-content::before {
+    background: #24344b;
+  }
+
+  .page-layout-menu-button,
+  .page-layout-menu-popup-label,
+  .page-layout-menu-search-name {
+    color: #ced7e5;
+  }
+
+  .page-layout-menu-button:hover,
+  .page-layout-menu-button:focus-visible,
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: rgb(255 255 255 / 8%);
+  }
+
+  .page-layout-menu-button.is-selected,
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    color: #fff;
+    background-color: #2d75d2;
+  }
+
+  .page-layout-menu-search-path {
+    color: #a7b7cc;
+  }
+}
+
+@media (max-width: 580px) {
+  .page-layout .page-layout-header-left .page-layout-menu-search {
+    min-width: 0;
+  }
+}

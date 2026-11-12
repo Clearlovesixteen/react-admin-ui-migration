@@ -310,7 +310,7 @@
     },
     {
       "path": "src/components/PageLayout/index.tsx",
-      "sha256": "80e69f3e13f3791cb371412a20345330c84c656721ddae793bb78cebb4b8d4ae"
+      "sha256": "bbcf45298e83e586ad27d7fb20a7d99125cd3a0a95385cc5f48c57a3c0a37e87"
     },
     {
       "path": "src/components/PageLayout/routes.ts",
@@ -451,6 +451,26 @@
     {
       "path": "src/components/PageLayout/menu-visual.less",
       "sha256": "781d5dd74ff88dac35148c0f6d38cdacb22eccac2a26a3d5b74042ac2f0188fa"
+    },
+    {
+      "path": "src/components/PageLayout/theme/ThemeToggle.tsx",
+      "sha256": "964379a877427d7f1aa2cb8a1342ec50837b0d1be5a4c3bc851989326bbd74bc"
+    },
+    {
+      "path": "src/components/PageLayout/theme/preference.d.ts",
+      "sha256": "42c5d8c8dd76215e2a0526fdaf24105519020096a8473d55f2e35e39cb88dcbf"
+    },
+    {
+      "path": "src/components/PageLayout/theme/preference.js",
+      "sha256": "b367412c03c251f234d667b939f39b021cf40854e5f7a4602b1cd8058bef75e5"
+    },
+    {
+      "path": "src/components/PageLayout/theme/theme.less",
+      "sha256": "60b8d5d52bb1d321f8b468f9cfc93fb82096a1d3fe2e64277d81de0f4ca67939"
+    },
+    {
+      "path": "src/components/PageLayout/theme/usePageLayoutTheme.ts",
+      "sha256": "0f723eb420542aa99d0314cbfa57a7667a6142a905f30b1a30a9bba651f6b7b7"
     },
     {
       "path": "src/components/PageLayout/types.ts",

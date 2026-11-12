@@ -7,6 +7,31 @@
     "antd": "^4.24.1",
     "@ant-design/icons": "^5.0.1"
   },
+  "layoutTheme": {
+    "name": "mes-layout-theme",
+    "default": "light",
+    "scope": "navigation-chrome-and-menu-portals",
+    "sources": [
+      {
+        "path": "src/layout/PageLayout/theme.ts",
+        "sha256": "6f63e452199b87882a5037911857dcb3acc95880b57d6d4185b4ec7a266d8cc3"
+      },
+      {
+        "path": "src/layout/PageLayout/theme.less",
+        "sha256": "59fa11280c35c44366a26fb972179dd4e690afe1b51f78e50ac7873c07883ffd"
+      },
+      {
+        "path": "src/layout/PageLayout/index.tsx",
+        "sha256": "675a754cf9907295bd099f4df8d496c220857a352fb42b72031851f552d8d6eb"
+      }
+    ],
+    "adaptations": [
+      "默认亮色，保留已有明确偏好",
+      "项目命名空间由适配器提供",
+      "首次渲染同步读取，布局提交阶段应用 portal 属性",
+      "本地开关图形兼容已有图标库版本"
+    ]
+  },
   "menuVisual": {
     "name": "wms-menu",
     "colors": {
@@ -30,7 +55,7 @@
       }
     ]
   },
-  "extraction": "包含项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。",
+  "extraction": "包含默认亮色且持久化偏好的 MES 外框主题、项目展示层、可注入请求的我的应用、WMS 菜单配色/本地单色图形和 Ant Design 4/Less 主题变量；排除业务入口、RouteTabs、用户/权限 Store、平台请求实现、品牌资源、UnoCSS 和文件中心。",
   "sources": [
     {
       "path": "src/components/PageLayout/config.ts",
@@ -95,6 +120,31 @@
       "sha256": "1439f6fde673905403709c6892f8340ecb7980116528c29fc791d9a1bb1ba182"
     },
     {
+      "repository": "migration-skill",
+      "path": "resources/layout-theme/preference.js",
+      "sha256": "b367412c03c251f234d667b939f39b021cf40854e5f7a4602b1cd8058bef75e5"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/layout-theme/preference.d.ts",
+      "sha256": "42c5d8c8dd76215e2a0526fdaf24105519020096a8473d55f2e35e39cb88dcbf"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/layout-theme/usePageLayoutTheme.ts",
+      "sha256": "0f723eb420542aa99d0314cbfa57a7667a6142a905f30b1a30a9bba651f6b7b7"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/layout-theme/ThemeToggle.tsx",
+      "sha256": "964379a877427d7f1aa2cb8a1342ec50837b0d1be5a4c3bc851989326bbd74bc"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/layout-theme/theme.less",
+      "sha256": "60b8d5d52bb1d321f8b468f9cfc93fb82096a1d3fe2e64277d81de0f4ca67939"
+    },
+    {
       "path": "config/theme.ts",
       "sha256": "b1f5aefa265929051490665f055993babf1eea299beb73921b1b6b61fedd5244"
     }
@@ -155,6 +205,26 @@
     {
       "path": "assets/page-layout/application-panel.less",
       "sha256": "1439f6fde673905403709c6892f8340ecb7980116528c29fc791d9a1bb1ba182"
+    },
+    {
+      "path": "assets/page-layout/theme/preference.js",
+      "sha256": "b367412c03c251f234d667b939f39b021cf40854e5f7a4602b1cd8058bef75e5"
+    },
+    {
+      "path": "assets/page-layout/theme/preference.d.ts",
+      "sha256": "42c5d8c8dd76215e2a0526fdaf24105519020096a8473d55f2e35e39cb88dcbf"
+    },
+    {
+      "path": "assets/page-layout/theme/usePageLayoutTheme.ts",
+      "sha256": "0f723eb420542aa99d0314cbfa57a7667a6142a905f30b1a30a9bba651f6b7b7"
+    },
+    {
+      "path": "assets/page-layout/theme/ThemeToggle.tsx",
+      "sha256": "964379a877427d7f1aa2cb8a1342ec50837b0d1be5a4c3bc851989326bbd74bc"
+    },
+    {
+      "path": "assets/page-layout/theme/theme.less",
+      "sha256": "60b8d5d52bb1d321f8b468f9cfc93fb82096a1d3fe2e64277d81de0f4ca67939"
     },
     {
       "path": "assets/theme/antd4.ts",

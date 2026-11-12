@@ -62,6 +62,10 @@ node "<skill目录>/scripts/prepare-framework.mjs" --output "<临时新空目录
 
 依据：[npm 项目配置与 scope 认证](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc/)。
 
+## 外框主题偏好
+
+完整框架已包含 MES 风格的亮暗外框与切换入口。按[主题偏好](theme-preference.md)核对目标存储 key、旧有效选择、默认亮色、退出不清理及跨次恢复；新项目和既有新架构补齐都包含此能力。
+
 ## Umi 职责映射
 
 | 旧入口 | 新职责 |

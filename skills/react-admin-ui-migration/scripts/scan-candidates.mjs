@@ -14,6 +14,7 @@ const rules = [
   ['user-state', /localStorage|useStoreUser|useModel|getStateUser/, '核对持久化命名空间、用户字段、换号动态 header、首次登录和退出清理'],
   ['request-layer', /requestApi|requestUc|setRequestConfig|requestHandler|PostForUserCenter/, '统一请求链并核对 GAPI/UC/Java 分流、原 payload、响应码和上传返回地址'],
   ['permission', /AuthRoute|AUTH_CONTROL|AUTH_OPEN|getUserPerm|getUserMenu|saveBatch/, '保留权限码/父子关系；区分菜单树和平铺列表，关闭时不等待接口，开启失败可重试；上传页可能触发写入'],
+  ['theme-preference', /useMesTheme|usePageLayoutTheme|data-(?:mes|page-layout)-theme|ThemeToggle|prefers-color-scheme/, '核对亮暗外框切换、默认亮色、手动偏好持久化与首次渲染恢复；已有有效偏好保留，命中不代表已验收'],
   ['file-center', /FileCenter|fileCenter|requestPageLayoutFiles/, '补接文件中心真实分页、身份、搜索、下载与异常反馈'],
   ['component-imports', /(?:from\s*|import\s*)['"](?:base-element-react(?:\/[^'"]*)?|@\/base-element-react(?:\/[^'"]*)?|(?:\.\.?\/)+(?:[^'"]*\/)?base-element-react(?:\/[^'"]*)?)['"]/, '检查旧包、本地组件或深层导入，确认新包的等价导出'],
   ['initialization', /\bBaseElement\.use\s*\(/, '核对全局配置、请求上传和组件默认值'],
@@ -231,7 +232,7 @@ export async function scanProject(projectPath) {
     legacyEvidence, modernEvidence,
     units: [
       ['entry', 'initialization'], ['request', 'request-layer'], ['identity', 'user-state'],
-      ['permissions', 'permission'], ['my-applications', 'application-panel'], ['file-center', 'file-center'], ['cache', 'route-cache'],
+      ['permissions', 'permission'], ['my-applications', 'application-panel'], ['file-center', 'file-center'], ['cache', 'route-cache'], ['theme-preference', 'theme-preference'],
     ].map(([unit, rule]) => ({
       unit, status: findings.some((item) => item.unit === rule) ? 'evidence-found-unverified' : 'needs-inspection',
       files: findings.filter((item) => item.unit === rule).map((item) => item.file),

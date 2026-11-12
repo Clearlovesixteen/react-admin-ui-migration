@@ -15,6 +15,9 @@ import { requestPageLayoutApplications } from './applications';
 import { requestPageLayoutFiles } from './files';
 import type { MenuNavigation } from './routes';
 import { renderRouteIcon } from './routeIcon';
+import { usePageLayoutTheme } from './theme/usePageLayoutTheme';
+import PageLayoutThemeToggle from './theme/ThemeToggle';
+import './theme/theme.less';
 import './project.less';
 import './file-center.less';
 
@@ -25,6 +28,7 @@ function navigate({ path, target }: MenuNavigation) {
 
 /** 项目适配器连接 Router/Store；保留已验证的展示 Shell 和所有 UI 修复。 */
 export default function PageLayout() {
+  const [theme, setTheme] = usePageLayoutTheme('page-layout-theme:' + env.VITE_APP_ID);
   const location = useLocation();
   const [user] = useStoreUser();
   const [auth] = useStoreAuth();
@@ -51,11 +55,13 @@ export default function PageLayout() {
   }, [location.key, location.pathname, location.search, location.state]);
   return (
     <PageLayoutShell
+      className={`page-layout-theme-${theme}`}
+      headerTrailingActions={[<PageLayoutThemeToggle key="theme" theme={theme} onChange={setTheme} />]}
       menuItems={menuItems}
       selectedKey={getSelectedMenuKey(menuItems, location.pathname)}
       brandLogo={env.BASE_URL + env.VITE_APP_ICON}
       brandTitle={env.VITE_APP_NAME}
-      background="linear-gradient(180deg, #eaf0fc 0%, #f2f5f7 100%)"
+      background={theme === 'dark' ? '#1d2c42' : 'linear-gradient(180deg, #eaf0fc 0%, #f2f5f7 100%)'}
       defaultCollapsed={window.innerWidth < 768}
       collapsedStorageKey={false}
       applicationPanel={{ loadApplications: requestPageLayoutApplications }}

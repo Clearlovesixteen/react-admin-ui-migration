@@ -1,0 +1,25 @@
+{
+  "name": "mes-layout-theme",
+  "default": "light",
+  "scope": "navigation-chrome-and-menu-portals",
+  "sources": [
+    {
+      "path": "src/layout/PageLayout/theme.ts",
+      "sha256": "6f63e452199b87882a5037911857dcb3acc95880b57d6d4185b4ec7a266d8cc3"
+    },
+    {
+      "path": "src/layout/PageLayout/theme.less",
+      "sha256": "59fa11280c35c44366a26fb972179dd4e690afe1b51f78e50ac7873c07883ffd"
+    },
+    {
+      "path": "src/layout/PageLayout/index.tsx",
+      "sha256": "675a754cf9907295bd099f4df8d496c220857a352fb42b72031851f552d8d6eb"
+    }
+  ],
+  "adaptations": [
+    "默认亮色，保留已有明确偏好",
+    "项目命名空间由适配器提供",
+    "首次渲染同步读取，布局提交阶段应用 portal 属性",
+    "本地开关图形兼容已有图标库版本"
+  ]
+}
