@@ -63,6 +63,8 @@ export function prepareFramework(sourceRepository) {
   add('src/pages/base/welcome/index.tsx', "import { env } from '@/common/env';\nexport default function Welcome() { return <section style={{ padding: 24 }}>欢迎使用{env.VITE_APP_NAME}</section>; }\n");
   add('index.html', '<!doctype html>\n<html lang="zh-CN"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>%VITE_APP_NAME%</title><script>globalThis.global = globalThis;</script></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n');
   add('.nvmrc', '20.20.2\n');
+  // npm pack 排除 .npmrc；分发无凭据示例，准备资源时映射为项目 .npmrc。
+  add('.npmrc.example', '@gancao-web:registry=https://web-registry.igancao.com/\n');
   const pkg = JSON.parse(readFileSync(join(source, 'package.json'), 'utf8'));
   const packageFragment = {
     private: true, type: 'module', packageManager: pkg.packageManager, engines: pkg.engines,

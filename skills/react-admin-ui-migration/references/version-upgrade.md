@@ -16,7 +16,7 @@
 
 ## 2. 查询目标项目正在使用的 registry
 
-在正确的目标 package/工作区上下文中，通过包管理器的配置解析确认 @gancao-web 的 scope registry；未设置时才采用默认 registry。沿用目标现有配置及认证，不把维护者内网地址硬编码进迁移命令，不修改用户全局 registry，也不输出完整 .npmrc 或令牌。
+先按[私有包源与 CI](framework-migration.md#私有包源与-ci)将用户指定的 `@gancao-web:registry=https://web-registry.igancao.com/` 合入项目安装根 `.npmrc`，保留其他配置和认证；未设置不能回退到公共镜像。再在正确的 package/工作区上下文中，通过包管理器配置解析确认生效源；用户明确要求其他企业代理时核实并记录，不修改全局 registry，不输出完整 .npmrc 或令牌。
 
 pnpm 项目使用以下只读查询；npm 项目使用相同参数的 npm view：
 

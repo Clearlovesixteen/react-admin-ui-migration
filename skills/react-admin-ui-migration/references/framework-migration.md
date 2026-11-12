@@ -42,6 +42,26 @@ node "<skill目录>/scripts/prepare-framework.mjs" --output "<临时新空目录
 
 环境示例只给键和少量框架默认值。将目标身份、品牌、菜单、原权限开关、保活开关、服务地址和测试入口填回后才能启动；空值不表示能力不适用。根 .env 不从维护者项目复制。
 
+## 私有包源与 CI
+
+使用或迁入 `@gancao-web/*` 时，版本查询和安装前，在实际安装根目录的项目 `.npmrc` 合入：
+
+~~~ini
+@gancao-web:registry=https://web-registry.igancao.com/
+~~~
+
+普通仓库与 package.json 同级；monorepo 核对 CI 的工作目录和包管理器读取的工作区根配置。缺失则补入，已正确则保持，旧 scope 源错误则修正该键；保留公共 registry、其他 scope、注释与有效认证设置，不覆盖整份文件，不修改用户全局配置。仅有个人全局源或本机缓存不能保证 Jenkins 能安装。用户明确指定了其他有效企业代理时核实后沿用并记录差异。
+
+分发使用无凭据的 `assets/framework/.npmrc.example`，避免 npm 打包自动排除 `.npmrc`；`prepare-framework.mjs` 在新空目录中将它输出为 `.npmrc`。资源仍须逐键合入目标，不能覆盖现有项目配置。需要认证时沿用 CI 凭据注入机制；不把 token、用户名密码或完整日志写入 skill/仓库，不打印完整配置。
+
+在本地和 CI **实际安装目录**核对 `node --version`、`pnpm --version` 与目标 engines、.nvmrc、packageManager、锁格式一致，再用 `pnpm config get @gancao-web:registry` 确认专用源并按[版本查询](version-upgrade.md)核实指定包版本。仅展示脱敏结果；含认证 URL 不原样记录。Node 16 / pnpm 7 不能沿用为本框架基线的已验证构建环境；.nvmrc/packageManager 声明本身不保证 Jenkins 已切版本。
+
+修正源后核对锁文件：如果旧锁显式固定了公共镜像 tarball/resolved 地址，改 `.npmrc` 未必改变下载目标。使用项目声明的包管理器修正受影响的解析、审查差异并保留版本及其他锁定内容，不整份删除锁或全量替换 URL。提交匹配的 `.npmrc`、包声明和锁，在隔离/干净安装环境执行 `pnpm install --frozen-lockfile`（其他包管理器用等价命令），再运行项目构建。
+
+404 的请求主机如果是公共镜像，先纠正源；正确源的 404 仍需查版本是否发布及访问权限。`No authorization header was set` 本身不证明必须新增 token。认证、网络、Node 或包管理器阻塞要分别记录；扫描器只检查目标目录的静态键，不读取上层/全局配置、不验证 CI 可达性或锁定下载地址。
+
+依据：[npm 项目配置与 scope 认证](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc/)。
+
 ## Umi 职责映射
 
 | 旧入口 | 新职责 |

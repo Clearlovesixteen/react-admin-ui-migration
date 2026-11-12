@@ -107,6 +107,7 @@ test('新版 npm 组件仅有主题变量导入时报告样式待验，不能将
 
 test('完整 Ant Design Less/CSS 入口可被发现，但仍明确未完成运行时验收', () => fixture(async (root, write) => {
   write('package.json', JSON.stringify({ dependencies: { '@gancao-web/base-element-react': '3.0.0' } }));
+  write('.npmrc', '@gancao-web:registry=https://web-registry.igancao.com/\n');
   write('src/global.less', "@import '~antd/dist/antd.less';\n");
   write('src/main.tsx', "import 'antd/dist/antd.css';\nconst value = <span className={target.color}>状态</span>;");
   const before = snapshot(root);

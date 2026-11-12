@@ -41,6 +41,7 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert(names.includes('skills/react-admin-ui-migration/scripts/scan-candidates.mjs'));
     assert(names.includes('skills/react-admin-ui-migration/scripts/prepare-framework.mjs'));
     assert(names.includes('skills/react-admin-ui-migration/assets/framework-manifest.json'));
+    assert(names.includes('skills/react-admin-ui-migration/assets/framework/.npmrc.example'));
     assert(names.includes('skills/react-admin-ui-migration/assets/framework/src/common/request.ts'));
     assert(names.includes('skills/react-admin-ui-migration/assets/framework/src/pages/base/login/index.tsx'));
     assert(!names.some((name) => /^(?:tests|scripts|node_modules|\.git|\.agents)\//.test(name)));
@@ -70,6 +71,7 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     ], { cwd: consumer, encoding: 'utf8', timeout: 10000 });
     assert.equal(generate.status, 0, generate.stderr);
     assert.equal(JSON.parse(generate.stdout).output, prepared);
+    assert.equal(readFileSync(join(prepared, '.npmrc'), 'utf8'), '@gancao-web:registry=https://web-registry.igancao.com/\n');
     assert(readFileSync(join(prepared, 'src/components/PageLayout/index.tsx'), 'utf8').includes('Outlet'));
   } finally {
     rmSync(temporary, { recursive: true, force: true });

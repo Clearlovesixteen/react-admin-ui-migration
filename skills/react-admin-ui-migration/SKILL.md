@@ -17,7 +17,7 @@ description: 将 React/Ant Design 旧后台迁入统一的 Vite、React Router�
 
 ## 1. 盘点并选择迁移路径
 
-阅读目标 AGENTS、README、package.json、锁文件、真实启动、路由/权限、状态、请求/上传、样式及一个业务代表模块。运行只读盘点：
+阅读目标 AGENTS、README、package.json、项目 .npmrc、锁文件、真实启动、路由/权限、状态、请求/上传、样式及一个业务代表模块。运行只读盘点：
 
 ~~~bash
 node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
@@ -32,6 +32,8 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 按 [框架流程](references/framework-migration.md) 固定可回退基线，再切工具链、请求与身份、路由权限、布局平台、业务边界。框架资源工具默认只列清单，--output 仅写新空目录；暂存后按差异合入目标，不能覆盖原 package.json、测试、业务目录或环境。
 
 按 [运行契约](references/request-and-login.md) 核对环境、GAPI/UC/Java、三类 token、用户 key、SSO 深链、权限码、树/平铺权限、关闭开关和上传。使用单一执行链、单一入口和正式 Layout；移除旧框架前确保所有生命周期职责已迁完。
+
+安装前按[私有包源与 CI](references/framework-migration.md#私有包源与-ci)将 `@gancao-web` 专用源合入实际安装根的 `.npmrc`，同时核对 CI 的 Node、包管理器与锁文件；已迁新框架和仅迁 UI 的项目也需要检查安装配置。
 
 保留目标业务直接依赖和有效修复；切 pnpm 时显式处理隐式依赖、多锁文件和真实安装布局。原单元测试不能被模板的测试环境开发服务替代。package.json 的资源参考不包含目标所有依赖和测试配置。
 

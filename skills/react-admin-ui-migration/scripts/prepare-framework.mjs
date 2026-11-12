@@ -16,7 +16,8 @@ export function prepareFramework(output) {
     assert(!lstatSync(source).isSymbolicLink(), '资源不能为符号链接');
     const data = readFileSync(source);
     assert.equal(createHash('sha256').update(data).digest('hex'), item.sha256, '资源指纹失效：' + item.path);
-    return { path: item.path, data };
+    // 仅此固定配置示例重命名，不允许任意 manifest 输出路径。
+    return { path: item.path === '.npmrc.example' ? '.npmrc' : item.path, data };
   });
   if (output) {
     const destination = resolve(output);

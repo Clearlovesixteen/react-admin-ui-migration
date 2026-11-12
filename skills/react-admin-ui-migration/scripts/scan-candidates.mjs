@@ -72,6 +72,40 @@ async function exists(path) {
   }
 }
 
+/** 仅检查项目配置的一个键；不解析环境变量、不读用户配置、不返回原始值或认证。 */
+async function inspectScopeRegistry(project, diagnostics) {
+  let status = 'missing';
+  try {
+    const path = join(project, '.npmrc');
+    const info = await lstat(path);
+    if (!info.isFile() || info.isSymbolicLink() || info.size > 2 * 1024 * 1024) {
+      status = 'unreadable';
+    } else {
+      const source = await readFile(path, 'utf8');
+      const entries = source.split(/\r?\n/).filter((line) => /^\s*@gancao-web:registry\s*=/.test(line));
+      if (entries.length > 1 || /^\s*\[/m.test(source)) status = 'needs-resolution';
+      else if (entries.length === 1) {
+        const match = /^\s*@gancao-web:registry\s*=\s*(?:"([^"\r\n]*)"|'([^'\r\n]*)'|([^#;\r\n]*?))\s*(?:[#;].*)?$/.exec(entries[0]);
+        const value = (match?.[1] ?? match?.[2] ?? match?.[3] ?? '').trim();
+        // 带引号后再跟注释的 INI 值可能保留引号，交由包管理器确认。
+        const quotedWithComment = /=\s*[\"']/.test(entries[0]) && /[\"']\s*[#;]/.test(entries[0]);
+        if (!value || value.includes('${') || quotedWithComment) status = 'needs-resolution';
+        else status = /^https:\/\/web-registry\.igancao\.com\/?$/.test(value) ? 'configured' : 'different';
+      }
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') status = 'unreadable';
+  }
+  const messages = {
+    missing: '项目 .npmrc 缺少 @gancao-web:registry；迁移时合入专用源，工作区须核对实际安装根，不能依赖个人全局配置或回退公共镜像',
+    different: '@gancao-web 的项目源与迁移要求不一致；核对并合入专用源，保留其他 scope、公共源和认证配置',
+    'needs-resolution': '@gancao-web 源含变量、重复或无法静态确认的声明；在实际本地/CI 安装目录核对包管理器解析结果',
+    unreadable: '项目 .npmrc 无法安全读取；未跟随符号链接，请单独核对实际安装配置',
+  };
+  if (messages[status]) diagnostics.push({ level: 'warning', file: '.npmrc', code: 'GANCAO_REGISTRY_' + status.toUpperCase().replaceAll('-', '_'), message: messages[status] });
+  return { scope: '@gancao-web', projectConfig: status, runtimeVerified: false };
+}
+
 /** 只读取受支持的源码；候选不能代替 API 核实或完整行为审查。 */
 export async function scanProject(projectPath) {
   const project = resolve(projectPath);
@@ -220,6 +254,12 @@ export async function scanProject(projectPath) {
     }
   }
 
+  const registryDependencies = { ...pkg.peerDependencies, ...pkg.optionalDependencies, ...declared };
+  const needsScopeRegistry = !!installedComponent || Object.entries(registryDependencies).some(([name, version]) => name.startsWith('@gancao-web/') || name === 'base-element-react' || /^npm:@gancao-web\//.test(String(version)));
+  const scopeRegistry = needsScopeRegistry
+    ? await inspectScopeRegistry(project, diagnostics)
+    : { scope: '@gancao-web', projectConfig: 'not-applicable', runtimeVerified: false };
+
   const lockFiles = [];
   for (const name of ['package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock']) {
     try {
@@ -262,6 +302,7 @@ export async function scanProject(projectPath) {
     packageManager: pkg.packageManager ?? null,
     nodeEngines: pkg.engines?.node ?? null,
     requestedNodeVersion,
+    scopeRegistry,
     legacyScriptNames,
     gitHookNames,
     lockFiles,

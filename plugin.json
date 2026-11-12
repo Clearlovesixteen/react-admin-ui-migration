@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "react-admin-ui-migration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React 后台框架迁移与新版 UI，支持旧架构迁入和新架构补齐",
   "extensions": {
     "com.openai": {

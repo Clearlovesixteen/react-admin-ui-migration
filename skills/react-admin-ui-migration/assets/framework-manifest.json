@@ -497,6 +497,10 @@
       "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
     },
     {
+      "path": ".npmrc.example",
+      "sha256": "6244ba3f0cdd32eb7cfe437701ebc6cffc2eca47fd58bc977e683219d99adeb4"
+    },
+    {
       "path": "package.json",
       "sha256": "303cf93965620d4618af9af755665e34103039cb9db8985008e7b0086165432b"
     },
