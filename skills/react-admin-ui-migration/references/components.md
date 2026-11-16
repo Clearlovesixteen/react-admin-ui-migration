@@ -22,7 +22,7 @@
 | 搜索项间距 | 右 40、下 24 | 右 12、下 14，padding: 0，colon: false |
 | 列表满高 | fitViewport: false | true，必须具备可用的父级高度 |
 | 搜索区默认收起 | defaultCollapsed: false | true，仍受展开/收起条件约束 |
-| 工具栏按钮 | 默认右对齐 | 左对齐、default 类型 |
+| 工具栏按钮 | 默认右对齐 | 左对齐、default 类型；查询表单 footer 仍单独右对齐 |
 | 表格操作列 | operationAlign: right | left |
 
 这份表描述维护项目的配置基线，不把目标业务分页协议、默认查询、缓存或按钮权限算作视觉默认值。后续版本发生变化时重新核对实现。
@@ -89,6 +89,9 @@ BaseElement.use 不包含 layout。PageLayout 由目标项目维护，不能从�
 - 示例采用四列；目标可用三列或页面覆盖。列数是布局选择，不是业务要求。
 - listForm 已删除；将其中的表单设置提升到 list 或页面的同层，不能移进影响所有弹窗的全局 form。
 - Grid 跨列用 colSpan: 2 / 'full'；title/editor 默认整行。旧 sty.display: 'flex' 在 Grid 中仍会占满行，确认意图后再清理。
+- `labelPosition: 'left'` 只控制表单字段标签，不代表重置/查询操作组或 `select-input` 内部下拉标签自动左对齐；需要左对齐时显式核对 `.select-label` 的文本和选中值样式。不要用全局 CSS 覆盖 `.base-list-search` 或 `.base-list-search-footer` 的右对齐，除非产品明确要求。
+- Grid 中的 `select-input` 包含内部维度标签和输入控件，不能按普通单字段估算宽度。文本、枚举和姓名类组合筛选默认保持单列；只有日期范围等确实需要更宽输入区的控件才配置 `colSpan: 2`。结合 `selectLabelWidth` 与 placeholder/日期范围的最小宽度选择跨度，并在四列、窄屏和重置后实际检查是否截断或挤压。
+- BaseForm Grid 会按当前行剩余列数计算 `base-form-footer` 的跨度；不要在项目 CSS 中把它强制为 `grid-column: 1 / -1`，否则筛选项较少的页面会把重置/查询按钮推到下一行。
 - inset 控制紧凑外观，itemBordered、colon、间距和列数独立配置。
 - labelWidth 仍有实际意义：Grid 标签超过槽宽时单行省略，悬浮显示。不要批量删除 labelWidth 或必须的弹窗 paddingX。
 - 动态 vif/disabled/libParam 等字段监听依赖配置函数中直接出现的字段名；抽成间接函数可能使旧联动失效。
@@ -115,6 +118,8 @@ BaseElement.use 不包含 layout。PageLayout 由目标项目维护，不能从�
 defaultRange 来自目标原默认值；value 是按维度索引保存的数组。单独使用 BaseSelectInput 组件时，维度选项用 lib；在 BaseForm item 中维度选项用 prop，内部控件仍用 field。不要混淆两层 API。
 
 保留切换维度时的值清理、回车与自动查询、重置、缓存和最终 API 字段。需要转换参数时集中映射，并在请求前去掉仅用于 UI 的临时字段。
+
+当旧页面把多个查询维度和日期范围展示为一个组合筛选项时，迁移后继续使用一个 `select-input`（`prop` 描述维度，`field` 承载 `picker-date`）；不要为了 Grid 排列拆成独立的“时间类型”与日期字段。拆分前必须证明旧接口和视觉行为都允许变化，并验证默认值、重置和最终 payload。
 
 ## 列表与表格
 

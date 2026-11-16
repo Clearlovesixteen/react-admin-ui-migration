@@ -44,6 +44,10 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 按 [组件迁移](references/components.md) 合并一次完整 BaseElement.use，保留目标 request/upload/file、分页、空值和生命周期合同。已符合的 3.x 页面不重复改造，专属编辑器和历史保持独立。
 
+Grid 搜索区中 `labelPosition: 'left'` 只用于字段标签；重置/查询 footer 默认保持右对齐。`select-input` 等组合字段要按内部标签宽度和输入内容配置 `colSpan`/`selectLabelWidth`，旧页面的组合时间筛选不能仅为排 Grid 而拆成独立字段，详见 [组件迁移](references/components.md)。
+
+不要用项目 CSS 强制 `.base-form-footer` 占满整行；3.x BaseForm 会按当前 Grid 行的剩余列数计算 footer，列表筛选项较少时重置/查询应与筛选项保持同一行。
+
 按 [样式与运行时](references/styles-and-runtime.md) 接完整 AntD 控件 CSS、组件扩展样式、Less 主题和 portal 浮层；变量导入不生成控件 CSS，安装和样式 mock 测试不能证明 UI 正常。
 
 按 [外壳接入](references/page-layout.md) 复用展示 Shell、WMS 本地图标/配色、搜索左边缘、折叠40×40和响应式；项目入口连接 Router/Store/权限/账户及真实平台加载器。我的应用和文件中心不使用静态数据或吞错返回空数组。
