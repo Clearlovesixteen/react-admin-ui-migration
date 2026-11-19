@@ -18,6 +18,7 @@
 | 能力 | 组件内置行为 | 当前项目的 UI 基线 |
 | --- | --- | --- |
 | 搜索布局 | flow，不指定统一列数 | grid，四列 |
+| 搜索项 label | 默认右对齐 | 左对齐（`labelPosition: 'left'`） |
 | 紧凑组合 / 表单项边框 | inset: false / itemBordered: false | 两者均为 true |
 | 搜索项间距 | 右 40、下 24 | 右 12、下 14，padding: 0，colon: false |
 | 列表满高 | fitViewport: false | true，必须具备可用的父级高度 |
@@ -43,6 +44,7 @@ const migratedConfig: BaseGlobalProps = {
     defaultCollapsed: true,
     layoutMode: 'grid',
     itemCol: 4,
+    labelPosition: 'left',
     inset: true,
     itemBordered: true,
     colon: false,
@@ -89,7 +91,7 @@ BaseElement.use 不包含 layout。PageLayout 由目标项目维护，不能从�
 - 示例采用四列；目标可用三列或页面覆盖。列数是布局选择，不是业务要求。
 - listForm 已删除；将其中的表单设置提升到 list 或页面的同层，不能移进影响所有弹窗的全局 form。
 - Grid 跨列用 colSpan: 2 / 'full'；title/editor 默认整行。旧 sty.display: 'flex' 在 Grid 中仍会占满行，确认意图后再清理。
-- `labelPosition: 'left'` 只控制表单字段标签，不代表重置/查询操作组或 `select-input` 内部下拉标签自动左对齐；需要左对齐时显式核对 `.select-label` 的文本和选中值样式。不要用全局 CSS 覆盖 `.base-list-search` 或 `.base-list-search-footer` 的右对齐，除非产品明确要求。
+- `labelPosition: 'left'` 是当前迁移 UI 基线，只控制外层表单字段标签，不代表重置/查询操作组或 `select-input` 内部下拉标签自动左对齐；需要左对齐时显式核对 `.select-label` 的文本和选中值样式。不要用全局 CSS 覆盖 `.base-list-search` 或 `.base-list-search-footer` 的右对齐，除非产品明确要求。
 - Grid 中的 `select-input` 包含内部维度标签和输入控件，不能按普通单字段估算宽度。文本、枚举和姓名类组合筛选默认保持单列；只有日期范围等确实需要更宽输入区的控件才配置 `colSpan: 2`。结合 `selectLabelWidth` 与 placeholder/日期范围的最小宽度选择跨度，并在四列、窄屏和重置后实际检查是否截断或挤压。
 - BaseForm Grid 会按当前行剩余列数计算 `base-form-footer` 的跨度；不要在项目 CSS 中把它强制为 `grid-column: 1 / -1`，否则筛选项较少的页面会把重置/查询按钮推到下一行。
 - inset 控制紧凑外观，itemBordered、colon、间距和列数独立配置。

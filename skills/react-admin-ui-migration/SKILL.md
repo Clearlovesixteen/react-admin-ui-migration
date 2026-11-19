@@ -44,7 +44,7 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 按 [组件迁移](references/components.md) 合并一次完整 BaseElement.use，保留目标 request/upload/file、分页、空值和生命周期合同。已符合的 3.x 页面不重复改造，专属编辑器和历史保持独立。
 
-Grid 搜索区中 `labelPosition: 'left'` 只用于字段标签；重置/查询 footer 默认保持右对齐。`select-input` 等组合字段要按内部标签宽度和输入内容配置 `colSpan`/`selectLabelWidth`，旧页面的组合时间筛选不能仅为排 Grid 而拆成独立字段，详见 [组件迁移](references/components.md)。
+Grid 搜索区默认配置 `labelPosition: 'left'`，只用于字段标签；重置/查询 footer 独立保持右对齐。`select-input` 等组合字段要按内部标签宽度和输入内容配置 `colSpan`/`selectLabelWidth`，旧页面的组合时间筛选不能仅为排 Grid 而拆成独立字段，详见 [组件迁移](references/components.md)。
 
 不要用项目 CSS 强制 `.base-form-footer` 占满整行；3.x BaseForm 会按当前 Grid 行的剩余列数计算 footer，列表筛选项较少时重置/查询应与筛选项保持同一行。
 
