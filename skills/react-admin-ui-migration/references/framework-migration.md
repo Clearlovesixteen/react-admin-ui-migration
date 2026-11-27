@@ -42,6 +42,10 @@ node "<skill目录>/scripts/prepare-framework.mjs" --output "<临时新空目录
 
 环境示例只给键和少量框架默认值。将目标身份、品牌、菜单、原权限开关、保活开关、服务地址和测试入口填回后才能启动；空值不表示能力不适用。根 .env 不从维护者项目复制。
 
+当前上游审查点为 master `106fb6303b00f1c839d899c48438f563f9ff7eaf`。资源由已适配试点核心、该提交的依赖组合、Skill 维护的展示/主题与发布提示组成，不是 master 全目录复制。已有 Store 精确订阅、权限隔离、SSO 深链及日志白名单修正必须保留。
+
+完整框架按[版本更新提示](version-update.md)接入版本产物和项目 Header 提示；应用 version/minVersion 保留目标发布策略，不使用模板业务版本或插件版本覆盖。Windows 细滚动条由 html.is-windows 与独立样式片段配合，保留目标完整 AntD CSS 和业务样式，不整份替换 global.less。
+
 ## 私有包源与 CI
 
 使用或迁入 `@gancao-web/*` 时，版本查询和安装前，在实际安装根目录的项目 `.npmrc` 合入：

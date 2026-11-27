@@ -9,7 +9,7 @@
 Ant Design 4 中：
 
 - `antd/es/style/themes/default.less` 只提供 Less 变量，不能当作 Table/Cascader/Modal 的结构样式。
-- base-element-react 3.0.0 自带组件扩展样式，内部直接从 `antd` 导入控件，没有替消费者载入完整 Ant Design 样式。
+- base-element-react 3.1.0 自带组件扩展样式，内部直接从 `antd` 导入控件，没有替消费者载入完整 Ant Design 样式。
 - Umi/Babel 的按需导入如果只转换应用源码，不会自动覆盖 node_modules 中这些间接引用。直接从应用导入过的 Input/Button 可能正常，封装中的 Table/Cascader 却完全失去样式。
 - 浮层通常通过 portal 挂在 body 下；只给 PageLayout 局部包裹样式不能覆盖这些节点。需实际展开下拉、级联、弹窗、抽屉后验证。
 - 纯表单弹窗还可能有组件内置 paddingX 或历史字段固定宽度；窄屏要验证正文宽度、标签排列和底部按钮，不能只让外层 Modal 缩小。保留页面级有效间距配置，并对已证实溢出的实例做响应式调整。

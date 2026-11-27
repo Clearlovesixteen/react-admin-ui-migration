@@ -1,6 +1,6 @@
 {
   "name": "@gancao-web/react-admin-ui-migration",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "React 后台框架迁移 Skill，包含 Vite/Router/Store/SDK、项目级布局、平台能力与离线盘点资源",
   "type": "module",
   "private": true,

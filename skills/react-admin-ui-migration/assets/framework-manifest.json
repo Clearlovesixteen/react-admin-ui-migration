@@ -3,7 +3,53 @@
   "upstream": {
     "project": "admin-template",
     "branch": "master",
-    "commit": "9c4b26a5354b8e333ef3aeb4808dee429f859220"
+    "commit": "106fb6303b00f1c839d899c48438f563f9ff7eaf"
+  },
+  "pilot": {
+    "role": "adapted-framework",
+    "commit": "f010443c015e19840c593ebb627cfd9afd28d6bd"
+  },
+  "upstreamSources": [
+    {
+      "path": "package.json",
+      "sha256": "73ca574c5666dfda18536b19538f80906603765a02743728676aa16d9657cb4a"
+    }
+  ],
+  "dependencyBaseline": {
+    "@gancao-web/base-element-react": "3.1.0",
+    "@gancao-web/request": "3.2.4",
+    "@base-web-kits/base-tools-ts": "2.1.5",
+    "@base-web-kits/base-tools-web": "2.1.5"
+  },
+  "versionUpdate": {
+    "upstream": {
+      "project": "admin-template",
+      "branch": "master",
+      "commit": "106fb6303b00f1c839d899c48438f563f9ff7eaf"
+    },
+    "sources": [
+      {
+        "path": "plugins/appVersion.ts",
+        "sha256": "7fc6448a5f407fb7daef85edb3186dda4c78581a558994adfc09fabf95bf38e0"
+      },
+      {
+        "path": "src/common/appVersion.ts",
+        "sha256": "6f4f792b9a055d0629de517eb090a6800f1d0740c98d100a3fe0ecbb00e4f062"
+      },
+      {
+        "path": "src/components/VersionUpdate/index.tsx",
+        "sha256": "cd7b0d4254e99c4d37a0d37d5a4dec2b99928f402d6608df58c9e47643b2e0af"
+      },
+      {
+        "path": "src/components/PageLayout/components/PageLayoutShell.tsx",
+        "sha256": "d7b3f148eaa381225041d6570591edc4d08a2b7ca0f65f09f242ec5ea288b84b"
+      },
+      {
+        "path": "src/global.less",
+        "sha256": "f2566c27427c8e474455c1d2b12aec99ab3d83ffaa0b41140b2a6f3c07c24816"
+      }
+    ],
+    "adaptation": "保留版本阈值、手动刷新和轮询语义；改为 ESM 构建资源引用，适配相对 base/子目录；提示挂载在项目 PageLayout adapter，不污染展示 Shell。"
   },
   "bindingKeys": [
     "VITE_APP_ID",
@@ -32,7 +78,7 @@
     "VITE_APP_HOST_JAVA_TEST",
     "VITE_APP_HOST_JAVA_PROD"
   ],
-  "extraction": "模板框架核心 + 实际迁移修正 + 已验证的展示资源；不含试点业务、环境值、品牌、凭据或 SDK 打包代码。package.json 是合并参考，旧测试/业务依赖须保留。",
+  "extraction": "已适配试点核心 + 固定 master 的四项依赖组合 + 维护版版本提示/Windows 样式 + 已验证展示资源；不是 master 全目录镜像。不含业务、环境值、品牌、凭据或 SDK 打包代码；目标发布号、测试和业务依赖须按原项目合并。",
   "origins": [
     {
       "path": "src/main.tsx",
@@ -219,18 +265,67 @@
       "sha256": "8fe9c9dd9b1b0078f12f2cf8da0c13b352fc5d29393f1b8b614cf1838f6d36fd"
     },
     {
+      "repository": "migration-skill",
+      "path": "resources/version-update/plugins/appVersion.d.mts",
+      "sha256": "c5d3b76fcded10209934c804b75a8e78bb64148753117a75378e5717bef42ad3"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/plugins/appVersion.mjs",
+      "sha256": "78a5d4b304f79d7797b0587cc10bd016661586b6c83d37df4f71834a0bf1e3e4"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/common/appVersion.d.ts",
+      "sha256": "ba43e92b168036da149541f0b4c38620c115a8f5283ea15a64c2c9ba083cc929"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/common/appVersion.js",
+      "sha256": "8175705d94f2e203e279c064960756ca9a3a10f19707a99c02c8ddaf653d4eac"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/components/VersionUpdate/check.d.ts",
+      "sha256": "1cba720058ea058aa190c7dbf8c9f2ff2aa5d5734ac79c9241f0aefbf591b848"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/components/VersionUpdate/check.js",
+      "sha256": "dbef6b1b5a9919a424285368b91ad4eece811812aa2b6fbbe0d17d5b833f0cb1"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/components/VersionUpdate/index.tsx",
+      "sha256": "033d2c79e8e29a8775bfaf96a4991c654be3e8aa303196c53e186d1d14f48344"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/version-update/src/version-update.d.ts",
+      "sha256": "861b7a680d0d7176ef1ee29030733d7a04b3fd90b83fc9decc49d7d1fde15ad7"
+    },
+    {
+      "repository": "migration-skill",
+      "path": "resources/framework/windows-scrollbar.less",
+      "sha256": "2f5bb787244f3a78fc1ea8be33bcee1e53a3fa2364251eb90ba0d1d72fce749e"
+    },
+    {
       "path": "src/global.less",
       "sha256": "09232e87169b4160b2596b4cde0405450f48fb2ab4ba656da6611088658d793d"
     },
     {
       "path": "src/components/PageLayout/project.less",
       "sha256": "edccade5a1874f6a43b46134ec5ca8a27a3fa1afe32af29c9e66890d2f467fb7"
+    },
+    {
+      "path": "package.json",
+      "sha256": "3b5438ff2dc952559fefd1ba148746966515c41c884833747ac6c800dc8afaec"
     }
   ],
   "artifacts": [
     {
       "path": "src/main.tsx",
-      "sha256": "956599ff079898a60bd6e0173b213c39e05e41e6baf3a17b9c1e91badfb6ee7d"
+      "sha256": "9e10377c04e7fb33621bbe8cdb58218a5572e5cbaf264b339b70a01dfad91332"
     },
     {
       "path": "src/env.d.ts",
@@ -250,7 +345,7 @@
     },
     {
       "path": "src/common/request.ts",
-      "sha256": "3e92bb56a94f7fd53fa8e322fa4c0c5e7afaf1f7937c74c4e1639461aed14f2f"
+      "sha256": "4917196d57c5e8cb0bb7d5f20a235a88154e84fbdb099af95a41126e89c985de"
     },
     {
       "path": "src/common/slsLog.ts",
@@ -310,7 +405,7 @@
     },
     {
       "path": "src/components/PageLayout/index.tsx",
-      "sha256": "bbcf45298e83e586ad27d7fb20a7d99125cd3a0a95385cc5f48c57a3c0a37e87"
+      "sha256": "a7797bdd55eb8c045cb23db4ee70a01432c95c06fe511bd42d4571684d1841fa"
     },
     {
       "path": "src/components/PageLayout/routes.ts",
@@ -378,7 +473,7 @@
     },
     {
       "path": "vite.config.ts",
-      "sha256": "dbff07755860d294666cccdc4cb7c5373cbe15378509c6792d49231d569ae0c2"
+      "sha256": "e2291ab5b2e9bc282698bf62dc30b4cb0957da78d7f24ed5c5959743770e61a4"
     },
     {
       "path": "uno.config.ts",
@@ -394,7 +489,7 @@
     },
     {
       "path": "tsconfig.node.json",
-      "sha256": "4138e29364e3a78448eb911d13712a4cbfc29100d1f0d7448b6242a758712983"
+      "sha256": "158153b028a613b380f367be1e4147f131a701714f84bcac48a3f0f55f1a5fbf"
     },
     {
       "path": "typings.d.ts",
@@ -489,8 +584,44 @@
       "sha256": "65c13608863dfbbfae097509d27b1c9593fbd108300e5e614c3b49f768d96a58"
     },
     {
+      "path": "plugins/appVersion.d.mts",
+      "sha256": "c5d3b76fcded10209934c804b75a8e78bb64148753117a75378e5717bef42ad3"
+    },
+    {
+      "path": "plugins/appVersion.mjs",
+      "sha256": "78a5d4b304f79d7797b0587cc10bd016661586b6c83d37df4f71834a0bf1e3e4"
+    },
+    {
+      "path": "src/common/appVersion.d.ts",
+      "sha256": "ba43e92b168036da149541f0b4c38620c115a8f5283ea15a64c2c9ba083cc929"
+    },
+    {
+      "path": "src/common/appVersion.js",
+      "sha256": "8175705d94f2e203e279c064960756ca9a3a10f19707a99c02c8ddaf653d4eac"
+    },
+    {
+      "path": "src/components/VersionUpdate/check.d.ts",
+      "sha256": "1cba720058ea058aa190c7dbf8c9f2ff2aa5d5734ac79c9241f0aefbf591b848"
+    },
+    {
+      "path": "src/components/VersionUpdate/check.js",
+      "sha256": "dbef6b1b5a9919a424285368b91ad4eece811812aa2b6fbbe0d17d5b833f0cb1"
+    },
+    {
+      "path": "src/components/VersionUpdate/index.tsx",
+      "sha256": "033d2c79e8e29a8775bfaf96a4991c654be3e8aa303196c53e186d1d14f48344"
+    },
+    {
+      "path": "src/version-update.d.ts",
+      "sha256": "861b7a680d0d7176ef1ee29030733d7a04b3fd90b83fc9decc49d7d1fde15ad7"
+    },
+    {
+      "path": "src/styles/windows-scrollbar.less",
+      "sha256": "2f5bb787244f3a78fc1ea8be33bcee1e53a3fa2364251eb90ba0d1d72fce749e"
+    },
+    {
       "path": "src/global.less",
-      "sha256": "58e325a1f392d994b60e2fefb98511cebadb10526c86407359b05ecdb5a40a92"
+      "sha256": "57d8a3aabec93eb7e9d1a538052b0e5d56229e98a598ad79e805a04908261ca1"
     },
     {
       "path": "src/components/PageLayout/project.less",
@@ -522,7 +653,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "303cf93965620d4618af9af755665e34103039cb9db8985008e7b0086165432b"
+      "sha256": "04162e91559638cff8e85ed56581998627b15ae936a3cd01f0e96e07e4ac8a2b"
     },
     {
       "path": ".env.example",

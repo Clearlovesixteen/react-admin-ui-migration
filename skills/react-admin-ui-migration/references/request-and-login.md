@@ -16,6 +16,8 @@ requestApi({ url, data, ...config })
 
 实际顺序是：无 url 走 requestGapi；有 url 且 API_MODE=gapis 走 requestHyperf；其余有 url 走 Java。Java 项目中的无 url GAPI 调用仍保持原分支。不要改写成“所有 Java 模式请求都走 Java”。
 
+资源已按 SDK 3.2.4 与 tools-ts/web 2.1.5 核对：HostConfig 仍为 development/test/pre/production；pre 无独立主机时显式复用 production。GAPI 与 Hyperf 使用同一目标 GAPI host；UC 和上传各自使用已绑定 host，不依赖维护环境的 SDK 默认域名。`RequestConfig['AK']` 较宽，GAPI 门面用 `RequestConfigGapi['AK']` 收窄；不要用 any 掩盖不支持的密钥标记。
+
 - package/class、filter、pageinfo.page/pagesize、零值/空值、响应 list/total 和业务错误语义属于项目合同，SDK 不负责自动改成目标分页。
 - 成功/失效码与解包先对照旧实现和已安装 SDK。基线 SDK 处理 GAPI 的 00000 / 800 / 10015，以及 Java/UC 的 1 / -10；其他项目码须明确适配。
 - 统一 SDK 链可保留临时薄门面，但门面不能继续执行第二套旧加密/HTTP 客户端。旧入口删除前全局核对调用闭包。
@@ -46,6 +48,10 @@ Store 以 name_APP_ID 隔离。切换旧 key 可选择一次重新登录或校�
 ## 上传与平台
 
 标准上传接进度/取消及 {url}；Braft 等专属调用接同一边界，不保留旧上传 HTTP 链。GAPI 的 name 可为 OSS 对象名，拼接目标文件 host；绝对 URL 不重复拼接，Java 直传尊重签名返回地址。主图的粘贴能力不改变正文长图模式的输入限制。
+
+SDK 3 的上传第二参数仍承载 onTaskReady，任务的 onProgressUpdate/abort 对接组件 onProgress/setAbort；成功结果必须有有效 url。Store 使用 EventBus.off(key, listener) 精确退订，不退回 off(key) 清除其他组件监听；SDK/工具升级不改变既有 Store、登录深链和权限慢响应隔离修正。
+
+已核对 SDK 3.2.4 的 uploadOSSAdmin：其内部签名请求不转发 option.host，也没有对象 data 来注入 sysId。分发门面先经本项目 requestUc（data:{}、目标 host、应用 sysId）取得 `/auth/base/oss/ticket` 签名，再交 SDK uploadOSS 直传，保留进度/取消与签名返回地址。目标已有等价签名流程直接复用，不把 uploadOSSAdmin 的类型可通过当成环境绑定正确。
 
 我的应用和文件中心是完整框架的接入项。应用列表走目标 UC；文件中心核对 appId、status、pageNum/pageSize、keyword/fileName 和下载 URL。错格式进入错误/重试，不把失败或未接接口转换成成功空数组。
 

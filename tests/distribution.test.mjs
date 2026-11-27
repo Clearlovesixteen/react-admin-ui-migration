@@ -18,7 +18,8 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
   const temporary = mkdtempSync(join(tmpdir(), 'ui-migration-package-'));
   try {
     const packed = spawnSync('npm', [
-      'pack', '--json', '--ignore-scripts', '--offline',
+      // 外层 npm pack --dry-run 会通过环境继承 dry-run；此处仍须实际生成隔离 tgz 才能验证解包。
+      'pack', '--dry-run=false', '--json', '--ignore-scripts', '--offline',
       '--cache', join(temporary, 'npm-cache'), '--pack-destination', temporary,
     ], { cwd: root, encoding: 'utf8', timeout: 30000 });
     assert.equal(packed.status, 0, packed.stderr);
@@ -46,6 +47,9 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert(names.includes('skills/react-admin-ui-migration/assets/framework/.npmrc.example'));
     assert(names.includes('skills/react-admin-ui-migration/assets/framework/src/common/request.ts'));
     assert(names.includes('skills/react-admin-ui-migration/assets/framework/src/pages/base/login/index.tsx'));
+    for (const path of ['plugins/appVersion.mjs', 'plugins/appVersion.d.mts', 'src/common/appVersion.js', 'src/common/appVersion.d.ts', 'src/version-update.d.ts', 'src/components/VersionUpdate/index.tsx', 'src/components/VersionUpdate/check.js', 'src/components/VersionUpdate/check.d.ts', 'src/styles/windows-scrollbar.less']) {
+      assert(names.includes('skills/react-admin-ui-migration/assets/framework/' + path), '离线包缺少版本/样式资源：' + path);
+    }
     assert(!names.some((name) => /^(?:tests|scripts|node_modules|\.git|\.agents)\//.test(name)));
     assert(!names.some((name) => name.endsWith('.env') || name.endsWith('.npmrc')));
 
@@ -77,6 +81,13 @@ test('npm 实际打包后能离线解包并在消费者目录运行扫描器', (
     assert.equal(preference.status, 0, preference.stderr);
     assert.equal(readFileSync(join(prepared, '.npmrc'), 'utf8'), '@gancao-web:registry=https://web-registry.igancao.com/\n');
     assert(readFileSync(join(prepared, 'src/components/PageLayout/index.tsx'), 'utf8').includes('Outlet'));
+    const frameworkPackage = JSON.parse(readFileSync(join(prepared, 'package.json'), 'utf8'));
+    assert.equal(frameworkPackage.dependencies['@gancao-web/base-element-react'], '3.1.0');
+    assert.equal(frameworkPackage.dependencies['@gancao-web/request'], '3.2.4');
+    assert.equal(frameworkPackage.dependencies['@base-web-kits/base-tools-ts'], '2.1.5');
+    assert.equal(frameworkPackage.dependencies['@base-web-kits/base-tools-web'], '2.1.5');
+    assert.equal(frameworkPackage.version, '1.0.0');
+    assert.equal(frameworkPackage.minVersion, '1.0.0');
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }

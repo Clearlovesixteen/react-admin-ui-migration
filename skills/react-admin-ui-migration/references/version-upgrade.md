@@ -12,7 +12,7 @@
 - 对照 README/CI 与 node_modules 安装布局；多份锁文件不代表允许切换包管理器，pnpm 严格布局也不等于 npm 原有扁平依赖。模块无法解析时先恢复已确认的安装方式，保留用户文件，不用换框架/批量升级掩盖问题。
 - 分别记录 package.json 声明范围、锁文件解析版本、node_modules 实际版本，并追踪业务 import/路径别名。扫描器会报告声明值和已安装新包元数据，不能代替锁文件及别名检查。
 - 存在本地组件、workspace/file/link/git 依赖或 npm 别名时，确认真正加载的实现和独有扩展。安装一个没有被页面引用的新包不能算完成升级；迁到包入口前先核对扩展的等价能力。
-- package.json 的 ^3.0.0、skill 的 3.0.0 基线和维护仓库源码版本均不能证明当前实际安装版本或 registry 已发布版本。
+- package.json 的 ^3.0.0、skill 的 3.1.0 资源基线和维护仓库源码版本均不能证明当前实际安装版本或 registry 的最高兼容发布版本。
 
 ## 2. 查询目标项目正在使用的 registry
 
@@ -37,7 +37,9 @@ Yarn 项目先确认 Classic/Berry 版本，再使用该版本的 info/npm info 
 
 ## 3. 选择兼容的稳定候选
 
-默认支持范围以 [组件基线](../assets/baseline.json) 为准：当前为不低于 3.0.0 的 3.x 稳定版。versions 用来找候选，dist-tags 用来解释发布渠道；latest 标签不能替代兼容性判断。
+默认迁移候选范围以 [组件基线](../assets/baseline.json) 为准：当前资源按 3.1.0 复现，选择不低于它的兼容 3.x 稳定版。旧版本的盘点仍然支持；用户固定旧版本时保留限制并单独核实能力，不把参考基线当作全量升级指令。versions 用来找候选，dist-tags 用来解释发布渠道；latest 标签不能替代兼容性判断。
+
+完整框架已核对的组合是组件 3.1.0、request 3.2.4、tools-ts/web 2.1.5；组件声明依赖 tools ^2.1.5，SDK 声明 peer ^2.1.3，不能只升 SDK 而保留 tools 1.x。资源保留既有 React 18.3.1 / Router 6.30.4 / Vite 8.2.1，不为贴齐 master 降级。框架的请求、上传、EventBus 和 Store 适配须以所选发布包真实类型复验；仅迁 UI 不顺带替换目标 SDK。
 
 1. 从实际发布列表中筛选支持范围内的稳定版本，按语义版本从高到低核对。排除 alpha/beta/rc 等预发布版本和已弃用版本；3.10.0 应高于 3.9.0，不能按字符串排序。
 2. 检查候选的 engines、peerDependencies、React/ReactDOM、Ant Design、Less 等约束，核对发布说明中的 API 变化与项目扩展；安装后还需检查真实类型和实现。单看主版本相同不能证明兼容。

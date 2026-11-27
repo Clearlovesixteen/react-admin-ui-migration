@@ -1,0 +1,30 @@
+{
+  "upstream": {
+    "project": "admin-template",
+    "branch": "master",
+    "commit": "106fb6303b00f1c839d899c48438f563f9ff7eaf"
+  },
+  "sources": [
+    {
+      "path": "plugins/appVersion.ts",
+      "sha256": "7fc6448a5f407fb7daef85edb3186dda4c78581a558994adfc09fabf95bf38e0"
+    },
+    {
+      "path": "src/common/appVersion.ts",
+      "sha256": "6f4f792b9a055d0629de517eb090a6800f1d0740c98d100a3fe0ecbb00e4f062"
+    },
+    {
+      "path": "src/components/VersionUpdate/index.tsx",
+      "sha256": "cd7b0d4254e99c4d37a0d37d5a4dec2b99928f402d6608df58c9e47643b2e0af"
+    },
+    {
+      "path": "src/components/PageLayout/components/PageLayoutShell.tsx",
+      "sha256": "d7b3f148eaa381225041d6570591edc4d08a2b7ca0f65f09f242ec5ea288b84b"
+    },
+    {
+      "path": "src/global.less",
+      "sha256": "f2566c27427c8e474455c1d2b12aec99ab3d83ffaa0b41140b2a6f3c07c24816"
+    }
+  ],
+  "adaptation": "保留版本阈值、手动刷新和轮询语义；改为 ESM 构建资源引用，适配相对 base/子目录；提示挂载在项目 PageLayout adapter，不污染展示 Shell。"
+}

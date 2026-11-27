@@ -28,7 +28,7 @@ function checkLocalImport(file, specifier, boundary) {
   const candidate = resolve(dirname(file), specifier);
   assert(isInside(boundary, candidate), '模板导入不能越出模板目录：' + specifier);
   assert(
-    ['', '.ts', '.tsx', '.less', '.json', '/index.ts', '/index.tsx'].some((suffix) => existsSync(candidate + suffix)),
+    ['', '.ts', '.tsx', '.js', '.mjs', '.less', '.json', '/index.ts', '/index.tsx'].some((suffix) => existsSync(candidate + suffix)),
     '模板缺少依赖：' + file + ' -> ' + specifier,
   );
 }
@@ -110,11 +110,23 @@ export function validateRepository(root = defaultRoot) {
   assert.equal(templateCount + themeCount, baseline.artifacts.length);
   const manifest = readJson(join(skillRoot, 'assets/framework-manifest.json'));
   const frameworkPackage = readJson(join(frameworkRoot, 'package.json'));
+  for (const [name, version] of Object.entries(manifest.dependencyBaseline)) {
+    assert.equal(frameworkPackage.dependencies[name], version, '框架依赖必须匹配已审查组合：' + name);
+  }
+  assert.equal(frameworkPackage.dependencies[baseline.componentPackage], baseline.componentVersion, '展示与框架的组件基线必须一致');
+  assert.equal(manifest.versionUpdate.upstream.commit, manifest.upstream.commit, '版本提示来源与上游审查点不一致');
   const external = new Set([
     'react', 'react-dom/client', 'react/jsx-runtime', 'antd/es/locale/zh_CN', 'uno.css',
     'node:url', 'node:fs', 'node:path', 'node:crypto', 'vite', 'unocss/vite',
     ...Object.keys(frameworkPackage.dependencies), ...Object.keys(frameworkPackage.devDependencies),
   ]);
+  // 唯一的虚拟模块由随包插件实现，不允许任意未声明依赖绕过闭包检查。
+  const versionPlugin = readFileSync(join(frameworkRoot, 'plugins/appVersion.mjs'), 'utf8');
+  assert(versionPlugin.includes("'virtual:app-version'"), '缺少版本虚拟模块实现');
+  assert(readFileSync(join(frameworkRoot, 'vite.config.ts'), 'utf8').includes('appVersionPlugin(env.VITE_APP_ENV)'), '版本插件未接入真实构建');
+  assert(readFileSync(join(frameworkRoot, 'src/components/PageLayout/index.tsx'), 'utf8').includes('<VersionUpdate key="version" />'), '版本提示未挂载到项目 Layout');
+  assert(/^\d+\.\d+\.\d+$/.test(frameworkPackage.version) && /^\d+\.\d+\.\d+$/.test(frameworkPackage.minVersion), '缺少应用版本绑定字段');
+  external.add('virtual:app-version');
   for (const artifact of manifest.artifacts) {
     const path = resolve(frameworkRoot, artifact.path);
     assert(isInside(frameworkRoot, path), '框架资源路径越界');

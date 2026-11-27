@@ -1,9 +1,9 @@
 import { request, uploadFile as uploadFileBase } from '@base-web-kits/base-tools-web';
 import {
   setRequestConfig, requestGapi, requestHyperf, requestJava,
-  requestUc as requestUcBase, uploadGapi, uploadOSSAdmin,
+  requestUc as requestUcBase, uploadGapi, uploadOSS,
 } from '@gancao-web/request';
-import type { HostConfig, RequestConfig, RequestConfigGapi, UploadOptionGapi } from '@gancao-web/request';
+import type { HostConfig, RequestConfig, RequestConfigGapi, UploadOptionGapi, OssSign } from '@gancao-web/request';
 import type { UploadTask } from '@base-web-kits/base-tools-web';
 import type { BaseUploadConfig } from '@gancao-web/base-element-react';
 import { getStateUser } from '@/hooks/useStoreUser';
@@ -35,7 +35,7 @@ export function initializeRequest() {
 /** 无 url 的既有 package/class 调用保持 GAPI，业务 payload 不在框架层改写。 */
 export function requestApi<T = any>(config: Omit<RequestConfig, 'AK'> & { AK?: RequestConfigGapi['AK'] }) {
   if (!config.url) return requestGapi<T>({ AK: env.VITE_APP_GAPI_AK, host: gapiHost, ...config });
-  if (env.VITE_APP_API_MODE === 'gapis') return requestHyperf<T>({ AK: env.VITE_APP_GAPI_AK, ...config });
+  if (env.VITE_APP_API_MODE === 'gapis') return requestHyperf<T>({ AK: env.VITE_APP_GAPI_AK, host: gapiHost, ...config });
   return requestJava<T>({ name: 'requestJava', host: javaHost, ...config });
 }
 
@@ -53,8 +53,11 @@ export async function uploadFile(config: BaseUploadConfig & UploadOptionGapi) {
       setAbort?.(() => task.abort());
     },
   };
+  // UC 签名使用目标 host/sysId；SDK 便捷方法不会转发这两个适配条件。
   const result = env.VITE_APP_API_MODE === 'java'
-    ? await uploadOSSAdmin({ ...other, sysId: env.VITE_APP_ID }, uploadConfig)
+    ? await uploadOSS(
+      await requestUc<OssSign>({ url: '/auth/base/oss/ticket', data: {} }), other, uploadConfig,
+    )
     : await uploadGapi({ host: uploadHost, ...other }, uploadConfig);
   if (!result.url) throw new Error('上传未返回文件地址');
   return {

@@ -1,0 +1,13 @@
+{
+  "upstream": {
+    "project": "admin-template",
+    "branch": "master",
+    "commit": "106fb6303b00f1c839d899c48438f563f9ff7eaf"
+  },
+  "dependencies": {
+    "@gancao-web/base-element-react": "3.1.0",
+    "@gancao-web/request": "3.2.4",
+    "@base-web-kits/base-tools-ts": "2.1.5",
+    "@base-web-kits/base-tools-web": "2.1.5"
+  }
+}

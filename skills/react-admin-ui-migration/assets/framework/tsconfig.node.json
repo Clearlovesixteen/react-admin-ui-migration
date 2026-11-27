@@ -20,6 +20,8 @@
   "include": [
     "vite.config.ts",
     "uno.config.ts",
-    "config/theme.ts"
+    "config/theme.ts",
+    "plugins/**/*.mjs",
+    "plugins/**/*.d.mts"
   ]
 }

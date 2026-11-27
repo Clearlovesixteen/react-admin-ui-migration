@@ -17,6 +17,7 @@ import type { MenuNavigation } from './routes';
 import { renderRouteIcon } from './routeIcon';
 import { usePageLayoutTheme } from './theme/usePageLayoutTheme';
 import PageLayoutThemeToggle from './theme/ThemeToggle';
+import VersionUpdate from '@/components/VersionUpdate';
 import './theme/theme.less';
 import './project.less';
 import './file-center.less';
@@ -65,7 +66,7 @@ export default function PageLayout() {
       defaultCollapsed={window.innerWidth < 768}
       collapsedStorageKey={false}
       applicationPanel={{ loadApplications: requestPageLayoutApplications }}
-      headerActions={[<PageLayoutFileCenter key="files" loadFiles={requestPageLayoutFiles} />]}
+      headerActions={[<VersionUpdate key="version" />, <PageLayoutFileCenter key="files" loadFiles={requestPageLayoutFiles} />]}
       account={{ name: user.username, menuItems: [{ key: 'logout', label: '退出登录', onClick: logout }] }}
       tabs={showRouteTabs ? <RouteTabs /> : undefined}
       contentScroll={findMenuByPath(menus, location.pathname)?.component ? 'child' : 'container'}

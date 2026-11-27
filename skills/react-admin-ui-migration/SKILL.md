@@ -34,6 +34,8 @@ node "<skill目录>/scripts/scan-candidates.mjs" "<目标项目>" --json
 
 按 [运行契约](references/request-and-login.md) 核对环境、GAPI/UC/Java、三类 token、用户 key、SSO 深链、权限码、树/平铺权限、关闭开关和上传。使用单一执行链、单一入口和正式 Layout；移除旧框架前确保所有生命周期职责已迁完。
 
+完整框架还按[版本更新提示](references/version-update.md)接构建清单与项目 Header，保留目标应用版本及最低版本策略；已有等价能力直接复用，仅迁 UI 不强制新增发布交互。不要将 master 的业务发布号或插件版本复制给目标应用。
+
 安装前按[私有包源与 CI](references/framework-migration.md#私有包源与-ci)将 `@gancao-web` 专用源合入实际安装根的 `.npmrc`，同时核对 CI 的 Node、包管理器与锁文件；已迁新框架和仅迁 UI 的项目也需要检查安装配置。
 
 保留目标业务直接依赖和有效修复；切 pnpm 时显式处理隐式依赖、多锁文件和真实安装布局。原单元测试不能被模板的测试环境开发服务替代。package.json 的资源参考不包含目标所有依赖和测试配置。

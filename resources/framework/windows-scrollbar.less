@@ -1,0 +1,21 @@
+/* 类名挂在 html 上，覆盖页面主滚动条和内部容器；不影响其他平台。 */
+html.is-windows {
+  &,
+  * {
+    scrollbar-color: fade(@gray-600, 32%) transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar { width: 8px; height: 8px; }
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-corner { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background-color: fade(@gray-600, 32%);
+      background-clip: padding-box;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      &:hover { background-color: fade(@gray-600, 48%); }
+    }
+    &::-webkit-scrollbar-button { display: none; }
+  }
+  .app-scrollbar-hide { scrollbar-width: none; }
+}

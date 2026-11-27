@@ -31,7 +31,7 @@ BaseElement.use({
   list: {
     pageKey: 'pageNum', sizeKey: 'pageSize', listKey: 'list', totalKey: 'pageinfo.total',
     pageSize: 10, isFilterEmpty: false, isShowBtnTools: false,
-    fitViewport: true, defaultCollapsed: true, layoutMode: 'grid', itemCol: 4,
+    fitViewport: true, defaultCollapsed: true, layoutMode: 'grid', itemCol: 4, labelPosition: 'left',
     inset: true, itemBordered: true, colon: false, itemRight: 12, itemBottom: 14, padding: 0,
     btnsConfig: { align: 'left', type: 'default' },
   },

@@ -23,6 +23,8 @@ skills/react-admin-ui-migration/
 scripts/                          维护、版本和打包检查
 resources/menu-visual/             WMS 菜单图形/独立配色的维护源
 resources/application-panel/       我的应用展示、响应转换与样式维护源
+resources/version-update/          应用版本提示、构建清单与轮询维护源
+resources/framework/               上游依赖组合和独立 Windows 样式
 tests/                            扫描器和分发契约验证
 ~~~
 
@@ -80,11 +82,11 @@ npm test
 npm pack --dry-run
 ~~~
 
-同步新的 UI 基线时，传入组件维护仓库的实际位置：
+同步展示基线时，传入实际包含项目 PageLayout 的源仓库。本地组件维护形态可沿用单参数；组件已经 npm 化时显式传入经 registry/锁核实的包元数据，不从过期 node_modules 推断版本：
 
 ~~~bash
-node scripts/sync-baseline.mjs "<base-element-react仓库>"
-node scripts/sync-baseline.mjs "<base-element-react仓库>" --check
+node scripts/sync-baseline.mjs "<展示源项目>" --component-package "<已核实组件包/package.json>"
+node scripts/sync-baseline.mjs "<展示源项目>" --component-package "<已核实组件包/package.json>" --check
 ~~~
 
 该命令提取展示层与 Less 主题变量，同时保留可注入请求的我的应用；排除源系统业务入口、平台请求实现、品牌图片、UnoCSS 和用户状态。规则发生变化时同步更新对应 references，不能只刷新快照。
@@ -109,13 +111,17 @@ node skills/react-admin-ui-migration/scripts/prepare-framework.mjs --output "<�
 
 资源工具不覆盖现有项目、不安装依赖、不执行消费者代码。先准备到新目录，再按差异合并；package.json 是参考，不包括目标所有业务依赖/既有测试。环境示例仅给键，无 CMS 身份或私有环境值。安装标识继续使用 react-admin-ui-migration，避免旧安装失联。
 
-维护框架快照：
+维护框架快照时明确区分已适配试点和上游 master，不能把 master 直接传作试点或用旧基线回写整个目录：
 
 ~~~bash
-node scripts/sync-framework.mjs "<迁移试点项目>"
-node scripts/sync-framework.mjs "<迁移试点项目>" --check
+node scripts/sync-framework.mjs "<已适配试点项目>" --upstream "<admin-template仓库>"
+node scripts/sync-framework.mjs "<已适配试点项目>" --upstream "<admin-template仓库>" --check
 ~~~
 
 框架基线来自 admin-template/master 的已固定提交，并包含实际迁移发现的修正；展示资源继续保留 WMS 图标、菜单配色、对齐与折叠修复。同步 UI 与框架资源后一起校验指纹和实际离线包。详细流程见 skills/react-admin-ui-migration/references/framework-migration.md。
+
+1.2.0 对齐 master `106fb63` 的组件 3.1.0、SDK 3.2.4 和 tools-ts/web 2.1.5，保留已有 React/Router/Vite 版本。完整框架新增应用版本清单与更新提示、Windows 细滚动条；推荐左对齐标签已写入生成入口。版本提示的 ESM、相对 base 和子目录路径经过适配，通用 Shell 保持项目无关。应用 version/minVersion 由目标应用管理，和插件版本分开。
+
+验证包含 Node 行为测试、生成一致性、离线打包/解包及隔离框架类型/构建检查。组件依赖中的旧 Braft 链仍声明 React 15/16 peer；这不是 SDK/tools 升级产生的问题，不能用强制忽略 peer 或本次构建通过代替目标编辑器的浏览器验收。详见 [运行时边界](skills/react-admin-ui-migration/references/styles-and-runtime.md)。
 
 资源/测试通过与真实业务验收分别记录。CMS 试点已脱离 Umi，真实 SSO 已返回原深链；浏览器定位并修复了 Vite 8 导入旧 Braft UMD 的默认导出兼容问题，以及表格插入按钮触发表单提交的问题。开发服务和 test 构建产物已核对真实列表、编辑器和表格插入。真实保存、上传、不同权限账号及部署回退仍需目标环境验收，不能把资源测试当成业务全流程通过。

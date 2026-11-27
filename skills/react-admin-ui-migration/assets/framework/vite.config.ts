@@ -6,6 +6,7 @@ import UnoCSS from 'unocss/vite';
 import svgr from 'vite-plugin-svgr';
 import { gancaoRequestProxy } from '@gancao-web/request';
 import { lessThemeVars } from './config/theme.ts';
+import { appVersionPlugin } from './plugins/appVersion.mjs';
 
 /** 目标项目 保留旧服务目标，开发代理与 SDK 使用相同的环境契约。 */
 export default defineConfig(({ mode }) => {
@@ -15,7 +16,7 @@ export default defineConfig(({ mode }) => {
   });
   return {
     base: './',
-    plugins: [UnoCSS(), react(), svgr(), legacy({ targets: ['defaults', 'not IE 11'], modernPolyfills: true })],
+    plugins: [appVersionPlugin(env.VITE_APP_ENV), UnoCSS(), react(), svgr(), legacy({ targets: ['defaults', 'not IE 11'], modernPolyfills: true })],
     resolve: { alias: [
       { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
       { find: /^~/, replacement: '' },

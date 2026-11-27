@@ -5,6 +5,8 @@
   "engines": {
     "node": ">=20.19.0"
   },
+  "version": "1.0.0",
+  "minVersion": "1.0.0",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
     "start": "vite --host 127.0.0.1 --port 8000",
@@ -20,10 +22,10 @@
   "dependencies": {
     "@ant-design/icons": "5.6.1",
     "@base-web-kits/base-tools-react": "1.4.8",
-    "@base-web-kits/base-tools-ts": "1.5.2",
-    "@base-web-kits/base-tools-web": "1.6.6",
-    "@gancao-web/base-element-react": "3.0.0",
-    "@gancao-web/request": "2.2.7",
+    "@base-web-kits/base-tools-ts": "2.1.5",
+    "@base-web-kits/base-tools-web": "2.1.5",
+    "@gancao-web/base-element-react": "3.1.0",
+    "@gancao-web/request": "3.2.4",
     "@remix-run/router": "1.23.3",
     "antd": "4.24.16",
     "react": "18.3.1",

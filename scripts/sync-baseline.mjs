@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,6 +41,11 @@ function extract(path, input) {
     output = output.replaceAll('内置平台能力之后的项目 Header 扩展。', '项目 Header 尾部扩展。');
   }
   if (path === 'components/PageLayoutShell.tsx') {
+    // master 新增的版本提示属于项目适配器；通用 Shell 仍保持无项目依赖。
+    if (output.includes("import VersionUpdate from '@/components/VersionUpdate';")) {
+      output = replaceExactly(output, "import VersionUpdate from '@/components/VersionUpdate';\n", '');
+      output = replaceExactly(output, '          <VersionUpdate />\n', '');
+    }
     for (const line of [
       "import PageLayoutFileCenter from './FileCenter';\n",
       '  fileCenter = false,\n',
@@ -122,11 +128,20 @@ function extract(path, input) {
 }
 
 /** 显式同步维护快照；不读取或记录源仓库地址、凭据和业务接口。 */
-export function prepareBaseline(sourceRepository) {
+export function prepareBaseline(sourceRepository, { componentManifest } = {}) {
   const sourceRoot = resolve(sourceRepository);
-  const library = JSON.parse(readFileSync(join(sourceRoot, 'src/base-element-react/package.json'), 'utf8'));
+  const rootPackageText = readFileSync(join(sourceRoot, 'package.json'), 'utf8');
+  const rootPackage = JSON.parse(rootPackageText);
+  const localManifest = join(sourceRoot, 'src/base-element-react/package.json');
+  const manifestPath = componentManifest ? resolve(componentManifest) : localManifest;
+  if (!existsSync(manifestPath)) throw new Error('未发现本地组件源码；请用 --component-package 指定已核实 npm 包的 package.json，不读取可能过期的 node_modules');
+  const libraryText = readFileSync(manifestPath, 'utf8');
+  const library = JSON.parse(libraryText);
+  if (library.name !== '@gancao-web/base-element-react' || !/^\d+\.\d+\.\d+$/.test(library.version)) throw new Error('组件元数据必须是已核实的 base-element-react 稳定版本');
+  if (componentManifest && rootPackage.dependencies?.[library.name] !== library.version) throw new Error('npm 组件元数据与源项目精确声明不一致，请先核对锁文件和实际包');
   const expected = new Map();
-  const origins = [];
+  const origins = [{ path: 'package.json', sha256: hash(rootPackageText) }];
+  if (!componentManifest) origins.push({ path: 'src/base-element-react/package.json', sha256: hash(libraryText) });
   const artifacts = [];
   for (const path of sourceFiles) {
     const sourcePath = 'src/components/PageLayout/' + path;
@@ -179,11 +194,14 @@ export function prepareBaseline(sourceRepository) {
   expected.set(themeArtifact, themeOutput);
   origins.push({ path: themePath, sha256: hash(themeInput) });
   artifacts.push({ path: themeArtifact, sha256: hash(themeOutput) });
-  const rootPackage = JSON.parse(readFileSync(join(sourceRoot, 'package.json'), 'utf8'));
+  let sourceCommit = null;
+  try { sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { /* 临时提取目录可无 Git，但不能虚构提交。 */ }
   const baseline = {
     schemaVersion: 1,
     componentPackage: library.name,
     componentVersion: library.version,
+    componentMetadata: { source: componentManifest ? 'published-package' : 'local-source', sha256: hash(libraryText) },
+    sourceCommit,
     uiDependencies: Object.fromEntries(['react', 'antd', '@ant-design/icons'].map((name) => [name, rootPackage.dependencies[name]])),
     layoutTheme: JSON.parse(readFileSync(join(repository, 'resources/layout-theme/source.json'), 'utf8')),
     menuVisual: JSON.parse(readFileSync(join(repository, 'resources/menu-visual/source.json'), 'utf8')),
@@ -196,21 +214,26 @@ export function prepareBaseline(sourceRepository) {
 }
 
 function main(args) {
-  const source = args.find((arg) => !arg.startsWith('--'));
-  if (!source || args.some((arg) => arg.startsWith('--') && arg !== '--check') || args.filter((arg) => !arg.startsWith('--')).length !== 1) {
-    throw new Error('用法：node scripts/sync-baseline.mjs <组件维护仓库> [--check]');
+  const [source, ...flags] = args;
+  let componentManifest;
+  let check = false;
+  for (let index = 0; index < flags.length; index++) {
+    if (flags[index] === '--check' && !check) check = true;
+    else if (flags[index] === '--component-package' && !componentManifest && flags[index + 1] && !flags[index + 1].startsWith('--')) componentManifest = flags[++index];
+    else throw new Error('用法：node scripts/sync-baseline.mjs <展示源项目> [--component-package <已核实组件package.json>] [--check]');
   }
-  const expected = prepareBaseline(source);
+  if (!source || source.startsWith('--')) throw new Error('需要明确的展示源项目');
+  const expected = prepareBaseline(source, { componentManifest });
   for (const [path, content] of expected) {
     const destination = join(skillRoot, path);
-    if (args.includes('--check')) {
+    if (check) {
       if (readFileSync(destination, 'utf8') !== content) throw new Error('基线或快照已变化：' + path);
     } else {
       mkdirSync(dirname(destination), { recursive: true });
       writeFileSync(destination, content);
     }
   }
-  console.log((args.includes('--check') ? '基线一致：' : '基线已同步：') + (expected.size - 1) + ' 个展示文件');
+  console.log((check ? '基线一致：' : '基线已同步：') + (expected.size - 1) + ' 个展示文件');
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
